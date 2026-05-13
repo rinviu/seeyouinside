@@ -357,21 +357,14 @@ if DEBUG:
 # CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 import os
-import dj_database_url
 
 # Настройки для Render.com
-if os.environ.get('RENDER'):
-    DEBUG = False
-    ALLOWED_HOSTS = ['*']
-    
-    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
-    
-    DATABASES = {
-        'default': dj_database_url.config(default='sqlite:///db.sqlite3')
-    }
+if os.environ.get('RENDER') or os.environ.get('DJANGO_SECRET_KEY'):
+    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-key')
+    DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
     
     # Статические файлы
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
     STATIC_ROOT = BASE_DIR / 'staticfiles'
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
