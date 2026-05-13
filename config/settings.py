@@ -355,16 +355,14 @@ if DEBUG:
 
 # CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 # CRISPY_TEMPLATE_PACK = "bootstrap5"
-
 import os
 
 # Настройки для Render.com
-if os.environ.get('RENDER') or os.environ.get('DJANGO_SECRET_KEY'):
-    SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-fallback-key')
-    DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
-    ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '*').split(',')
-    
-    # Статические файлы
-    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
-    STATIC_ROOT = BASE_DIR / 'staticfiles'
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'SeeYouInside2026SecretKey!VeryLongRandomString')
+DEBUG = os.environ.get('DJANGO_DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = ['*']
+
+# Whitenoise для статики (БЕЗ СЖАТИЯ)
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
