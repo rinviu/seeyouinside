@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Вход | SeeYouInside{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="auth-card">
+                <h2 class="auth-title">Вход</h2>
+                <p class="auth-subtitle">Войдите в свой аккаунт</p>
+                
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Неверное имя пользователя или пароль
+                    </div>
+                    {% endif %}
+                    
+                    <div class="auth-group">
+                        <label for="id_username" class="auth-label">Имя пользователя</label>
+                        <input type="text" name="username" id="id_username" 
+                               class="auth-input" placeholder="Введите имя пользователя"
+                               value="{{ form.username.value|default:'' }}" required>
+                    </div>
+                    
+                    <div class="auth-group">
+                        <label for="id_password" class="auth-label">Пароль</label>
+                        <input type="password" name="password" id="id_password" 
+                               class="auth-input" placeholder="Введите пароль" required>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn">Войти</button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p class="auth-text">Нет аккаунта?</p>
+                    <a href="{% url 'shop:register' %}" class="auth-link">Создать аккаунт</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

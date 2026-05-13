@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Корзина | SeeYouInside{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="fw-bold mb-4">
+        <i class="fas fa-shopping-cart me-2"></i>Корзина
+    </h1>
+    
+    {% if cart_items %}
+    <div class="row">
+        <!-- СПИСОК ТОВАРОВ -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-0">
+                    {% for item in cart_items %}
+                    <div class="cart-item p-3">
+                        <!-- Изображение -->
+                        <img src="{{ item.product.image.url }}" 
+                        alt="{{ item.product.name }}" 
+                        class="cart-item-image"
+                        style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                        
+                        <!-- Информация -->
+                        <div class="cart-item-info">
+                            <h5 class="cart-item-title">
+                                <a href="{% url 'shop:product_detail' item.product.id item.product.slug %}" 
+                                   class="text-decoration-none text-dark">
+                                    {{ item.product.name }}
+                                </a>
+                            </h5>
+                            {% if item.size_selected %}
+                            <p class="text-muted small mb-1">Размер: {{ item.size_selected }}</p>
+                            {% endif %}
+                            <p class="cart-item-price">{{ item.product.get_current_price }} ₽</p>
+                        </div>
+                        
+                        <!-- Количество -->
+                        <div class="cart-item-quantity">
+                            <form action="{% url 'shop:cart_update' item.id %}" method="post" class="d-flex align-items-center">
+                                {% csrf_token %}
+                                <button type="submit" name="action" value="decrease" class="quantity-btn">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <span class="mx-3 fw-bold" id="quantity-{{ item.id }}">{{ item.quantity }}</span>
+                                <button type="submit" name="action" value="increase" class="quantity-btn">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Сумма и удаление -->
+                        <div class="text-end ms-4">
+                            <div class="fw-bold fs-5 mb-2" id="item-total-{{ item.id }}">
+                                {{ item.total_price }} ₽
+                            </div>
+                            <form action="{% url 'shop:cart_remove' item.id %}" method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Удалить товар из корзины?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% if not forloop.last %}
+                    <hr class="m-0">
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <!-- Кнопки -->
+            <div class="d-flex justify-content-between mt-3">
+                <a href="{% url 'shop:catalog' %}" class="btn btn-outline-dark">
+                    <i class="fas fa-arrow-left me-2"></i>Продолжить покупки
+                </a>
+                <form action="{% url 'shop:cart_clear' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-danger" 
+                            onclick="return confirm('Очистить корзину?')">
+                        <i class="fas fa-trash me-2"></i>Очистить корзину
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- ИТОГО -->
+        <div class="col-lg-4">
+            <div class="cart-summary shadow-sm">
+                <h5 class="fw-bold mb-4">Ваш заказ</h5>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Товары ({{ cart_count }} шт.)</span>
+                    <span id="cart-total">{{ cart_total }} ₽</span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between fw-bold fs-5 mb-4">
+                    <span>Итого</span>
+                    <span>{{ cart_total }} ₽</span>
+                </div>
+                
+                <a href="{% url 'shop:checkout' %}" class="btn btn-primary w-100 btn-lg">
+                    <i class="fas fa-check me-2"></i>Оформить заказ
+                </a>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- ПУСТАЯ КОРЗИНА -->
+    <div class="text-center py-5">
+        <i class="fas fa-shopping-cart fa-5x text-muted mb-4"></i>
+        <h2>Ваша корзина пуста</h2>
+        <p class="text-muted mb-4">Добавьте товары в корзину, чтобы оформить заказ</p>
+        <a href="{% url 'shop:catalog' %}" class="btn btn-primary btn-lg">
+            <i class="fas fa-shopping-bag me-2"></i>Перейти в каталог
+        </a>
+    </div>
+    {% endif %}
+    
+    <!-- РЕКОМЕНДУЕМЫЕ ТОВАРЫ -->
+    {% if recommended_products %}
+    <section class="mt-5">
+        <h3 class="fw-bold mb-4">Рекомендуем также</h3>
+        <div class="row">
+            {% for product in recommended_products %}
+            <div class="col-6 col-md-3 mb-4">
+                <div class="product-card card h-100 border-0 shadow-sm">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
+                         style="height: 180px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h6 class="card-title">{{ product.name }}</h6>
+                        <p class="card-text fw-bold text-primary">{{ product.price }} ₽</p>
+                        <a href="{% url 'shop:product_detail' product.id product.slug %}" 
+                           class="btn btn-outline-primary btn-sm w-100">
+                            Подробнее
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}

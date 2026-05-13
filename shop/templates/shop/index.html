@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SeeYouInside - Магазин стильной одежды{% endblock %}
+
+{% block content %}
+
+<!-- ГЛАВНЫЙ БАННЕР -->
+<section class="hero-banner">
+    <div class="hero-banner-image">
+        <img src="{% static 'img/banner-1.jpg' %}" alt="SeeYouInside">
+    </div>
+    <div class="hero-banner-overlay">
+        <div class="container">
+            <div class="hero-banner-content">
+                <h1 class="hero-title">SeeYouInside</h1>
+                <p class="hero-subtitle">Одежда, в которой хочется остаться дома. Стильно, комфортно, доступно.</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'shop:catalog' %}" class="hero-btn hero-btn-primary">В каталог</a>
+                    <a href="{% url 'shop:catalog' %}?sale_only=1" class="hero-btn hero-btn-outline">Распродажа</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- НОВИНКИ -->
+<section class="section-new">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Новинки</h2>
+            <a href="{% url 'shop:catalog' %}?new_only=1" class="section-link">Смотреть все →</a>
+        </div>
+        <div class="products-grid">
+            {% for product in new_products %}
+            <div class="product-card-minimal">
+                <a href="{% url 'shop:product_detail' product.id product.slug %}" class="product-image-link">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                    {% endif %}
+                    {% if product.is_new %}
+                    <span class="product-badge-new">NEW</span>
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <p class="product-category">{{ product.category.name }}</p>
+                    <p class="product-price">{{ product.price }} ₽</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- БАННЕР С КОЛЛЕКЦИЕЙ -->
+<section class="banner-collection">
+    <div class="container">
+        <div class="banner-collection-inner">
+            <img src="{% static 'img/banner2.jpg' %}" alt="Коллекция" class="banner-collection-image">
+            <div class="banner-collection-content">
+                <span class="banner-collection-tag">Новая коллекция</span>
+                <h2 class="banner-collection-title">Весна / Лето 2026</h2>
+                <p class="banner-collection-text">Стильная коллекция с новыми идейными решениями. Стильные и функциональные товары для дома и бизнеса.</p>
+                <a href="{% url 'shop:catalog' %}?new_only=1" class="banner-collection-link">Смотреть коллекцию →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ПОПУЛЯРНЫЕ ТОВАРЫ -->
+{% if popular_products %}
+<section class="section-popular">
+    <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Будьте открыты к новым ощущениям</h2>
+            <p class="section-subtitle">Будь в курсе новых тенденций и стилей.</p>
+        </div>
+        <div class="products-grid products-grid-4">
+            {% for product in popular_products %}
+            <div class="product-card-minimal">
+                <a href="{% url 'shop:product_detail' product.id product.slug %}" class="product-image-link">
+                    {% if product.image %}
+                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+                    {% endif %}
+                </a>
+                <div class="product-info">
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <p class="product-price">{{ product.price }} ₽</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- КАТЕГОРИИ -->
+<section class="section-categories">
+    <div class="container">
+        <div class="categories-grid">
+            <a href="{% url 'shop:catalog_category' 'women' %}" class="category-card">
+                <img src="{% static 'img/category-women.jpg' %}" alt="Женщинам" class="category-image">
+                <div class="category-overlay">
+                    <h3 class="category-title">Женщинам</h3>
+                    <span class="category-link">Смотреть →</span>
+                </div>
+            </a>
+            <a href="{% url 'shop:catalog_category' 'men' %}" class="category-card">
+                <img src="{% static 'img/category-men.jpg' %}" alt="Мужчинам" class="category-image">
+                <div class="category-overlay">
+                    <h3 class="category-title">Мужчинам</h3>
+                    <span class="category-link">Смотреть →</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- О БРЕНДЕ -->
+<section class="section-about">
+    <div class="container">
+        <div class="about-grid">
+            <div class="about-image">
+                <img src="{% static 'img/aboutbrand.jpg' %}" alt="SeeYouInside">
+            </div>
+            <div class="about-content">
+                <span class="about-tag">О бренде</span>
+                <h2 class="about-title">SeeYouInside</h2>
+                <p class="about-text">Мы создаем одежду для тех, кто ценит комфорт, качество и индивидуальный стиль. Каждая вещь — это сочетание современных трендов и непревзойденного удобства.</p>
+                <a href="{% url 'shop:about' %}" class="about-link">Узнать больше →</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ПРЕИМУЩЕСТВА -->
+<section class="section-features">
+    <div class="container">
+        <div class="features-grid-minimal">
+            <div class="feature-item-minimal">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-truck"></i>
+                </div>
+                <div class="feature-content">
+                    <h4 class="feature-title-minimal">Быстрая доставка</h4>
+                    <p class="feature-text-minimal">По Москве и всей России</p>
+                </div>
+            </div>
+            <div class="feature-item-minimal">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <div class="feature-content">
+                    <h4 class="feature-title-minimal">Гарантия качества</h4>
+                    <p class="feature-text-minimal">Проверяем каждый товар</p>
+                </div>
+            </div>
+            <div class="feature-item-minimal">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-undo-alt"></i>
+                </div>
+                <div class="feature-content">
+                    <h4 class="feature-title-minimal">Легкий возврат</h4>
+                    <p class="feature-text-minimal">14 дней на возврат</p>
+                </div>
+            </div>
+            <div class="feature-item-minimal">
+                <div class="feature-icon-circle">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <div class="feature-content">
+                    <h4 class="feature-title-minimal">Поддержка 24/7</h4>
+                    <p class="feature-text-minimal">Всегда на связи</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

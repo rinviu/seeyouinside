@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}Доставка и оплата | SeeYouInside{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="fw-bold mb-4 text-center">Доставка и оплата</h1>
+    
+    <div class="row">
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4"><i class="fas fa-truck me-2"></i>Доставка</h4>
+                    
+                    <h5>По Москве</h5>
+                    <ul class="mb-4">
+                        <li>Курьерская доставка - 1-2 дня, 350 ₽</li>
+                        <li>Бесплатная доставка при заказе от 5000 ₽</li>
+                        <li>Самовывоз из пункта выдачи - бесплатно</li>
+                    </ul>
+                    
+                    <h5>По России</h5>
+                    <ul class="mb-4">
+                        <li>Почта России - 3-10 дней, от 300 ₽</li>
+                        <li>СДЭК - 2-7 дней, от 400 ₽</li>
+                        <li>Бесплатная доставка при заказе от 7000 ₽</li>
+                    </ul>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        После отправки заказа вы получите трек-номер для отслеживания
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4"><i class="fas fa-credit-card me-2"></i>Оплата</h4>
+                    
+                    <h5>Наличными</h5>
+                    <p class="mb-4">При получении заказа курьеру или в пункте выдачи</p>
+                    
+                    <h5>Банковской картой</h5>
+                    <p class="mb-4">Онлайн-оплата через защищенное соединение. Принимаем карты Visa, Mastercard, МИР</p>
+                    
+                    <h5>Электронными деньгами</h5>
+                    <p class="mb-4">ЮMoney, Qiwi</p>
+                    
+                    <div class="alert alert-success">
+                        <i class="fas fa-shield-alt me-2"></i>
+                        Все платежи защищены. Мы не храним данные ваших карт
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

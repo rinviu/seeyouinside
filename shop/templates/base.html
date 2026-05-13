@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="{% block meta_description %}SeeYouInside - интернет-магазин стильной и комфортной одежды{% endblock %}">
+    <meta name="author" content="Некит Карина Руслановна">
+    <title>{% block title %}SeeYouInside - Магазин одежды{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <header class="header-adeleide">
+        <!-- Верхняя черная панель -->
+        <div class="header-top">
+            <div class="container">
+                <div class="header-top-content">
+                    <div class="header-left">
+                        <div class="club-wrapper">
+                            {% if user.is_authenticated %}
+                            <a href="{% url 'shop:profile' %}" class="club-trigger">{{ user.username }}</a>
+                            <div class="club-tooltip">{{ user.username }} | <a href="{% url 'shop:logout' %}" style="color: #e74c3c;">Выйти</a></div>
+                            {% else %}
+                            <a href="{% url 'shop:login' %}" class="club-trigger">SEEYOUINSIDE CLUB</a>
+                            <div class="club-tooltip">Войти / Регистрация</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="header-right">
+                        <span class="header-promo">Бесплатная доставка от 5000 ₽</span>
+                        <span class="divider">|</span>
+                        <a href="{% url 'shop:delivery' %}" class="header-link">Доставка</a>
+                        <span class="divider">|</span>
+                        <a href="{% url 'shop:contacts' %}" class="header-link">Контакты</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Основная шапка -->
+        <div class="header-main">
+            <div class="container">
+                <div class="header-main-content">
+                    <div class="header-left-section">
+                        <a href="{% url 'shop:index' %}" class="brand-link">
+                            <img src="{% static 'img/logo.jpg' %}" alt="SeeYouInside" class="brand-logo">
+                        </a>
+                    </div>
+                    <div class="header-center-section">
+                        <a href="{% url 'shop:index' %}" class="center-logo-link">
+                            <span class="center-logo-text">SEEYOUINSIDE</span>
+                        </a>
+                    </div>
+                    <div class="header-right-section">
+                       <a href="{% url 'shop:wishlist_detail' %}" class="header-icon" title="Избранное">
+                        <i class="far fa-heart"></i>
+                        <span class="icon-badge wishlist-count" id="wishlist-count-badge">
+                            {{ wishlist_count|default:0 }}
+                        </span>
+                    </a>
+                        <a href="{% url 'shop:cart_detail' %}" class="header-icon cart-icon" title="Корзина">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="icon-badge" id="cart-count-badge">{{ cart_count|default:0 }}</span>
+                        </a>
+                        <button class="mobile-menu-toggle d-lg-none" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Навигация -->
+        <div class="header-nav-wrapper">
+            <div class="container">
+                <nav class="header-nav" id="mainNav">
+                    <button class="nav-close-btn d-lg-none" id="navCloseBtn"><i class="fas fa-times"></i></button>
+                    <ul class="nav-menu">
+                        <li class="nav-item"><a href="#" class="nav-link mega-menu-trigger" data-menu="catalog">КАТАЛОГ <i class="fas fa-chevron-down ms-1"></i></a></li>
+                        <li class="nav-item"><a href="#" class="nav-link mega-menu-trigger" data-menu="collections">КОЛЛЕКЦИИ <i class="fas fa-chevron-down ms-1"></i></a></li>
+                        <li class="nav-item"><a href="{% url 'shop:catalog' %}?new_only=1" class="nav-link">НОВИНКИ</a></li>
+                        <li class="nav-item"><a href="{% url 'shop:catalog' %}?sale_only=1" class="nav-link sale-link">SALE</a></li>
+                        <li class="nav-item"><a href="{% url 'shop:about' %}" class="nav-link">О БРЕНДЕ</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Поиск -->
+        <div class="header-search-wrapper">
+            <div class="container">
+                <form action="{% url 'shop:catalog' %}" method="get" class="header-search-form">
+                    <button type="submit" class="search-submit-btn"><i class="fas fa-search"></i></button>
+                    <input type="text" name="q" class="search-input" placeholder="Поиск товаров..." value="{{ request.GET.q }}">
+                    <button type="button" class="search-clear-btn" id="searchClearBtn" style="display: none;"><i class="fas fa-times"></i></button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- МЕГА-МЕНЮ: Каталог -->
+        <div class="mega-menu" id="mega-menu-catalog">
+            <div class="container">
+                <div class="mega-menu-content">
+                    <div class="mega-menu-column">
+                        <h4 class="mega-menu-title">ЖЕНЩИНАМ</h4>
+                        <ul class="mega-menu-list">
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}">Все товары</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=dresses">Платья</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=blouses">Блузы и рубашки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=jeans_women">Джинсы</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=trousers_women">Брюки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=skirts">Юбки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=jackets_women">Жакеты и пиджаки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=knitwear">Трикотаж</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'women' %}?subcategory=outerwear_women">Верхняя одежда</a></li>
+                        </ul>
+                        <a href="{% url 'shop:catalog_category' 'women' %}" class="mega-menu-all">Все товары →</a>
+                    </div>
+                    <div class="mega-menu-column">
+                        <h4 class="mega-menu-title">МУЖЧИНАМ</h4>
+                        <ul class="mega-menu-list">
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}">Все товары</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=shirts">Рубашки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=tshirts">Футболки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=jeans_men">Джинсы</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=trousers_men">Брюки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=hoodies">Худи и свитшоты</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=jackets_men">Куртки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=suits">Костюмы</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'men' %}?subcategory=outerwear_men">Верхняя одежда</a></li>
+                        </ul>
+                        <a href="{% url 'shop:catalog_category' 'men' %}" class="mega-menu-all">Все товары →</a>
+                    </div>
+                    <div class="mega-menu-column">
+                        <h4 class="mega-menu-title">АКСЕССУАРЫ</h4>
+                        <ul class="mega-menu-list">
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}">Все аксессуары</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}?subcategory=bags">Сумки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}?subcategory=belts">Ремни</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}?subcategory=hats">Головные уборы</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}?subcategory=scarves">Шарфы и платки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}?subcategory=gloves">Перчатки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}?subcategory=jewelry">Украшения</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'accessories' %}?subcategory=glasses">Очки</a></li>
+                        </ul>
+                        <a href="{% url 'shop:catalog_category' 'accessories' %}" class="mega-menu-all">Все аксессуары →</a>
+                    </div>
+                    <div class="mega-menu-column">
+                        <h4 class="mega-menu-title">ОБУВЬ</h4>
+                        <ul class="mega-menu-list">
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}">Вся обувь</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}?subcategory=sneakers">Кроссовки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}?subcategory=heels">Туфли</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}?subcategory=boots">Ботинки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}?subcategory=winter_boots">Сапоги</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}?subcategory=flats">Балетки</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}?subcategory=loafers">Лоферы</a></li>
+                            <li><a href="{% url 'shop:catalog_category' 'shoes' %}?subcategory=sandals">Сандалии</a></li>
+                        </ul>
+                        <a href="{% url 'shop:catalog_category' 'shoes' %}" class="mega-menu-all">Вся обувь →</a>
+                    </div>
+                    <div class="mega-menu-banner">
+                        <div class="menu-banner-content">
+                            <h5>НОВАЯ КОЛЛЕКЦИЯ</h5>
+                            <p>Весна-Лето 2026</p>
+                            <a href="{% url 'shop:catalog' %}?new_only=1" class="btn-banner">Смотреть →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- МЕГА-МЕНЮ: Коллекции -->
+        <div class="mega-menu" id="mega-menu-collections">
+            <div class="container">
+                <div class="mega-menu-content">
+                    <div class="mega-menu-column">
+                        <h4 class="mega-menu-title">КОЛЛЕКЦИИ</h4>
+                        <ul class="mega-menu-list">
+                            <li><a href="{% url 'shop:catalog' %}?collection=basic">Базовая коллекция</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?collection=evening">Вечерняя коллекция</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?collection=sport">Спортивная коллекция</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?collection=business">Деловая коллекция</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?collection=casual">Повседневная коллекция</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?collection=city">Капсула "Город"</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?collection=relax">Капсула "Отдых"</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?collection=limited">Limited Edition</a></li>
+                        </ul>
+                        <a href="{% url 'shop:catalog' %}" class="mega-menu-all">Все коллекции →</a>
+                    </div>
+                    <div class="mega-menu-column">
+                        <h4 class="mega-menu-title">ПО СЕЗОНУ</h4>
+                        <ul class="mega-menu-list">
+                            <li><a href="{% url 'shop:catalog' %}?season=spring-summer-2026">Весна-Лето 2026</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?season=autumn-winter-2026">Осень-Зима 2026</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?season=cruise">Круизная коллекция</a></li>
+                            <li><a href="{% url 'shop:catalog' %}?season=preorder">Предзаказ</a></li>
+                        </ul>
+                    </div>
+                    <div class="mega-menu-banner">
+                        <div class="menu-banner-content" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <h5>SEE YOU INSIDE</h5>
+                            <p>Одежда для дома и улицы</p>
+                            <a href="{% url 'shop:catalog' %}" class="btn-banner">В каталог →</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="footer-adeleide">
+        <div class="container">
+            <div class="footer-top">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <h5 class="footer-title">SEEYOUINSIDE</h5>
+                        <p class="footer-text">Стильная и комфортная одежда.</p>
+                        <div class="footer-social">
+                            <a href="#"><i class="fab fa-vk"></i></a>
+                            <a href="#"><i class="fab fa-telegram"></i></a>
+                            <a href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h6 class="footer-subtitle">Покупателям</h6>
+                        <ul class="footer-list">
+                            <li><a href="{% url 'shop:catalog' %}">Каталог</a></li>
+                            <li><a href="{% url 'shop:delivery' %}">Доставка</a></li>
+                            <li><a href="#">Возврат</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h6 class="footer-subtitle">О компании</h6>
+                        <ul class="footer-list">
+                            <li><a href="{% url 'shop:about' %}">О нас</a></li>
+                            <li><a href="{% url 'shop:contacts' %}">Контакты</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-6 mb-4">
+                        <h6 class="footer-subtitle">Контакты</h6>
+                        <ul class="footer-list footer-contacts">
+                            <li><i class="fas fa-phone"></i> 8 (800) 123-45-67</li>
+                            <li><i class="fas fa-envelope"></i> info@seeyouinside.ru</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="copyright">&copy; 2026 SeeYouInside. Дипломный проект Некит К.Р.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const triggers = document.querySelectorAll('.mega-menu-trigger');
+            const menus = document.querySelectorAll('.mega-menu');
+            let activeMenu = null, timeoutId = null;
+            
+            triggers.forEach(trigger => {
+                trigger.addEventListener('mouseenter', function() {
+                    clearTimeout(timeoutId);
+                    const menu = document.getElementById('mega-menu-' + this.dataset.menu);
+                    if (activeMenu && activeMenu !== menu) activeMenu.classList.remove('active');
+                    if (menu) { menu.classList.add('active'); activeMenu = menu; }
+                });
+            });
+            
+            document.querySelector('.header-nav-wrapper').addEventListener('mouseleave', function() {
+                timeoutId = setTimeout(() => { if (activeMenu) { activeMenu.classList.remove('active'); activeMenu = null; } }, 300);
+            });
+            
+            menus.forEach(menu => {
+                menu.addEventListener('mouseenter', () => clearTimeout(timeoutId));
+                menu.addEventListener('mouseleave', function() { this.classList.remove('active'); activeMenu = null; });
+            });
+            
+            document.getElementById('mobileMenuToggle')?.addEventListener('click', () => {
+                document.getElementById('mainNav').classList.add('active');
+            });
+            document.getElementById('navCloseBtn')?.addEventListener('click', () => {
+                document.getElementById('mainNav').classList.remove('active');
+            });
+            
+            const si = document.querySelector('.search-input');
+            const sc = document.getElementById('searchClearBtn');
+            if (si && sc) {
+                si.addEventListener('input', () => sc.style.display = si.value ? 'flex' : 'none');
+                sc.addEventListener('click', () => { si.value = ''; sc.style.display = 'none'; si.focus(); });
+            }
+            
+           fetch('/api/header-info/').then(r => r.json()).then(d => {
+    const cartBadge = document.getElementById('cart-count-badge');
+    const wishBadge = document.getElementById('wishlist-count-badge');
+    if (cartBadge) cartBadge.textContent = d.cart_count || 0;
+    if (wishBadge) wishBadge.textContent = d.wishlist_count || 0;
+}).catch(() => {});
+        });
+    </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const h = document.querySelector('.header-adeleide');
+            const hm = document.querySelector('.header-main');
+            const bl = document.querySelector('.brand-logo');
+            const cl = document.querySelector('.center-logo-text');
+            const nl = document.querySelectorAll('.nav-link');
+            
+            window.addEventListener('scroll', function() {
+                const s = window.pageYOffset > 50;
+                h.classList.toggle('header-scrolled', s);
+                hm.classList.toggle('header-main-scrolled', s);
+                if (bl) bl.classList.toggle('brand-logo-scrolled', s);
+                if (cl) cl.classList.toggle('center-logo-scrolled', s);
+                nl.forEach(l => l.classList.toggle('nav-link-scrolled', s));
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

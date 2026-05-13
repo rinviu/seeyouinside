@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Регистрация | SeeYouInside{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5 col-lg-4">
+            <div class="auth-card">
+                <h2 class="auth-title">Регистрация</h2>
+                <p class="auth-subtitle">Создайте новый аккаунт</p>
+                
+                <form method="post" class="auth-form">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        Пожалуйста, исправьте ошибки ниже
+                    </div>
+                    {% endif %}
+                    
+                    <div class="auth-group">
+                        <label for="id_username" class="auth-label">Имя пользователя</label>
+                        <input type="text" name="username" id="id_username" 
+                               class="auth-input" placeholder="Придумайте имя пользователя"
+                               value="{{ form.username.value|default:'' }}" required>
+                        {% if form.username.errors %}
+                        <p class="auth-error">{{ form.username.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="auth-group">
+                        <label for="id_password1" class="auth-label">Пароль</label>
+                        <input type="password" name="password1" id="id_password1" 
+                               class="auth-input" placeholder="Придумайте пароль" required>
+                        {% if form.password1.errors %}
+                        <p class="auth-error">{{ form.password1.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="auth-group">
+                        <label for="id_password2" class="auth-label">Подтверждение пароля</label>
+                        <input type="password" name="password2" id="id_password2" 
+                               class="auth-input" placeholder="Повторите пароль" required>
+                        {% if form.password2.errors %}
+                        <p class="auth-error">{{ form.password2.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <button type="submit" class="auth-btn">Создать аккаунт</button>
+                </form>
+                
+                <div class="auth-footer">
+                    <p class="auth-text">Уже есть аккаунт?</p>
+                    <a href="{% url 'shop:login' %}" class="auth-link">Войти</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

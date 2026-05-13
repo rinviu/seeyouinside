@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Заказ оформлен | SeeYouInside{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 text-center">
+            <div class="card shadow-sm border-success">
+                <div class="card-body p-5">
+                    <i class="fas fa-check-circle fa-5x text-success mb-4"></i>
+                    
+                    <h1 class="fw-bold mb-4">Заказ №{{ order.id }} оформлен!</h1>
+                    
+                    <p class="lead mb-4">
+                        Спасибо за заказ, {{ order.first_name }}!
+                    </p>
+                    
+                    <div class="alert alert-info mb-4">
+                        <i class="fas fa-envelope me-2"></i>
+                        Мы отправили подтверждение на email: <strong>{{ order.email }}</strong>
+                    </div>
+                    
+                    <div class="row text-start mb-4">
+                        <div class="col-md-6 mx-auto">
+                            <h5 class="fw-bold mb-3">Детали заказа:</h5>
+                            <table class="table">
+                                <tr>
+                                    <td class="text-muted">Номер заказа</td>
+                                    <td class="fw-bold">#{{ order.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Дата</td>
+                                    <td>{{ order.created_at|date:"d.m.Y H:i" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Статус</td>
+                                    <td><span class="badge bg-warning">{{ order.get_status_display }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Способ оплаты</td>
+                                    <td>{{ order.get_payment_method_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Адрес доставки</td>
+                                    <td>{{ order.address }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-muted">Сумма заказа</td>
+                                    <td class="fw-bold fs-5">{{ order.total_price }} ₽</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'shop:index' %}" class="btn btn-outline-dark">
+                            <i class="fas fa-home me-2"></i>На главную
+                        </a>
+                        <a href="{% url 'shop:catalog' %}" class="btn btn-primary">
+                            <i class="fas fa-shopping-bag me-2"></i>Продолжить покупки
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

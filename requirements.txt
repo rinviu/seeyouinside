@@ -1,0 +1,22 @@
+# Основные зависимости проекта SeeYouInside
+# Установка: pip install -r requirements.txt
+
+# Django - основной фреймворк
+
+
+# Работа с изображениями
+
+# Для продакшена (опционально)
+# gunicorn==21.2.0
+# psycopg2-binary==2.9.9
+# whitenoise==6.6.0
+
+# Для разработки (опционально)
+# django-debug-toolbar==4.3.0
+# django-extensions==3.2.3
+Django==5.0.3
+Pillow==10.2.0
+gunicorn==22.0.0
+whitenoise==6.7.0
+dj-database-url==2.2.0
+psycopg2-binary==2.9.9

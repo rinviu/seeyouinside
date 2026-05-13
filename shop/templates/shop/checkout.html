@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Оформление заказа | SeeYouInside{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h1 class="fw-bold mb-4">
+        <i class="fas fa-clipboard-list me-2"></i>Оформление заказа
+    </h1>
+    
+    <div class="row">
+        <!-- ФОРМА -->
+        <div class="col-lg-8 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <form method="post" id="checkout-form">
+                        {% csrf_token %}
+                        
+                        <!-- Контактные данные -->
+                        <h5 class="fw-bold mb-3">Контактные данные</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label">Имя *</label>
+                                <input type="text" name="first_name" class="form-control" required
+                                       value="{{ initial_data.first_name|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Фамилия *</label>
+                                <input type="text" name="last_name" class="form-control" required
+                                       value="{{ initial_data.last_name|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email *</label>
+                                <input type="email" name="email" class="form-control" required
+                                       value="{{ initial_data.email|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Телефон *</label>
+                                <input type="tel" name="phone" class="form-control" required
+                                       value="{{ initial_data.phone|default:'' }}" placeholder="+7 (999) 123-45-67">
+                            </div>
+                        </div>
+                        
+                        <!-- Адрес доставки -->
+                        <h5 class="fw-bold mb-3">Адрес доставки</h5>
+                        <div class="mb-4">
+                            <label class="form-label">Адрес *</label>
+                            <textarea name="address" class="form-control" rows="3" required
+                                      placeholder="Город, улица, дом, квартира">{{ initial_data.address|default:'' }}</textarea>
+                        </div>
+                        
+                        <!-- Способ оплаты -->
+                        <h5 class="fw-bold mb-3">Способ оплаты</h5>
+                        <div class="mb-4">
+                            <div class="form-check mb-2">
+                                <input type="radio" name="payment_method" value="cash" id="cash" 
+                                       class="form-check-input" checked>
+                                <label for="cash" class="form-check-label">
+                                    <i class="fas fa-money-bill-wave me-2"></i>Наличными при получении
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input type="radio" name="payment_method" value="card_courier" id="card" 
+                                       class="form-check-input">
+                                <label for="card" class="form-check-label">
+                                    <i class="fas fa-credit-card me-2"></i>Картой курьеру
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Комментарий -->
+                        <h5 class="fw-bold mb-3">Комментарий к заказу</h5>
+                        <div class="mb-4">
+                            <textarea name="comment" class="form-control" rows="2" 
+                                      placeholder="Дополнительная информация (необязательно)"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                            <i class="fas fa-check me-2"></i>Подтвердить заказ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- СОСТАВ ЗАКАЗА -->
+        <div class="col-lg-4">
+            <div class="cart-summary shadow-sm">
+                <h5 class="fw-bold mb-4">Ваш заказ</h5>
+                
+                {% for item in cart_items %}
+                <div class="d-flex mb-3">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" 
+                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                    <div class="ms-3 flex-grow-1">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold">{{ item.product.name }}</span>
+                            <span>{{ item.total_price }} ₽</span>
+                        </div>
+                        <small class="text-muted">
+                            {{ item.quantity }} шт.
+                            {% if item.size_selected %} | Размер: {{ item.size_selected }}{% endif %}
+                        </small>
+                    </div>
+                </div>
+                {% endfor %}
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Товары ({{ cart_count }} шт.)</span>
+                    <span>{{ cart_total }} ₽</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Доставка</span>
+                    <span class="text-success">Бесплатно</span>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between fw-bold fs-5">
+                    <span>Итого</span>
+                    <span>{{ cart_total }} ₽</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
