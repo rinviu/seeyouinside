@@ -111,6 +111,8 @@ class Product(models.Model):
     image_2 = models.ImageField(upload_to='products/%Y/%m/%d/', blank=True, null=True, verbose_name="Дополнительное фото 1")
     image_3 = models.ImageField(upload_to='products/%Y/%m/%d/', blank=True, null=True, verbose_name="Дополнительное фото 2")
     image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото (URL)")
+    image_url_2 = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото 2")
+    image_url_3 = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото 3")
     
     available = models.BooleanField(default=True, verbose_name="В наличии")
     is_new = models.BooleanField(default=False, verbose_name="Новинка")
