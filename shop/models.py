@@ -107,10 +107,13 @@ class Product(models.Model):
     color = models.CharField(max_length=50, blank=True, null=True, verbose_name="Цвет")
     material = models.CharField(max_length=200, blank=True, null=True, verbose_name="Состав/материал")
     
-    image = models.ImageField(upload_to='products/%Y/%m/%d/', verbose_name="Главное фото товара")
+    # Загружаемые фото
+    image = models.ImageField(upload_to='products/%Y/%m/%d/', verbose_name="Главное фото товара", blank=True, null=True)
     image_2 = models.ImageField(upload_to='products/%Y/%m/%d/', blank=True, null=True, verbose_name="Дополнительное фото 1")
     image_3 = models.ImageField(upload_to='products/%Y/%m/%d/', blank=True, null=True, verbose_name="Дополнительное фото 2")
-    image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото (URL)")
+    
+    # Ссылки на фото из внешних источников (Telegram, Imgur, PostImages)
+    image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на главное фото")
     image_url_2 = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото 2")
     image_url_3 = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото 3")
     

@@ -50,7 +50,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('size', 'color', 'material')
         }),
         ('Изображения', {
-            'fields': ('image_url', 'image', 'image_preview', 'image_2', 'image_3')
+            'fields': ('image_url', 'image_url_2', 'image_url_3', 'image', 'image_preview', 'image_2', 'image_3')
         }),
         ('Статистика', {
             'fields': ('views_count', 'created_at', 'updated_at'),

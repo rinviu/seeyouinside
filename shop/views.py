@@ -196,15 +196,19 @@ def product_detail(request, id, slug):
     related_products = Product.objects.filter(category=product.category, available=True).exclude(id=product.id).order_by('-views_count')[:4]
     sizes = product.get_sizes_list()
     
-    # === ИСПРАВЛЕННЫЙ БЛОК ===
+    # Изображения: сначала URL-ссылки, потом загруженные файлы
     images = []
     if product.image_url:
         images.append({'url': product.image_url, 'alt': product.name, 'is_main': True})
     elif product.image:
         images.append({'url': product.image.url, 'alt': product.name, 'is_main': True})
-    if product.image_2:
+    if product.image_url_2:
+        images.append({'url': product.image_url_2, 'alt': f'{product.name} - вид 2', 'is_main': False})
+    elif product.image_2:
         images.append({'url': product.image_2.url, 'alt': f'{product.name} - вид 2', 'is_main': False})
-    if product.image_3:
+    if product.image_url_3:
+        images.append({'url': product.image_url_3, 'alt': f'{product.name} - вид 3', 'is_main': False})
+    elif product.image_3:
         images.append({'url': product.image_3.url, 'alt': f'{product.name} - вид 3', 'is_main': False})
     
     in_cart = False
