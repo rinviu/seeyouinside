@@ -18,10 +18,22 @@
                     {% for item in cart_items %}
                     <div class="cart-item p-3">
                         <!-- Изображение -->
+                        {% if item.product.image_url %}
+                        <img src="{{ item.product.image_url }}" 
+                             alt="{{ item.product.name }}" 
+                             class="cart-item-image"
+                             style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                        {% elif item.product.image %}
                         <img src="{{ item.product.image.url }}" 
-                        alt="{{ item.product.name }}" 
-                        class="cart-item-image"
-                        style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                             alt="{{ item.product.name }}" 
+                             class="cart-item-image"
+                             style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+                        {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center" 
+                             style="width: 100px; height: 100px; border-radius: 8px; margin-right: 20px; flex-shrink: 0;">
+                            <i class="fas fa-image fa-2x text-muted"></i>
+                        </div>
+                        {% endif %}
                         
                         <!-- Информация -->
                         <div class="cart-item-info">
@@ -129,9 +141,17 @@
             {% for product in recommended_products %}
             <div class="col-6 col-md-3 mb-4">
                 <div class="product-card card h-100 border-0 shadow-sm">
-                    {% if product.image %}
+                    {% if product.image_url %}
+                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}"
+                         style="height: 180px; object-fit: cover;">
+                    {% elif product.image %}
                     <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
                          style="height: 180px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" 
+                         style="height: 180px;">
+                        <i class="fas fa-image fa-3x text-muted"></i>
+                    </div>
                     {% endif %}
                     <div class="card-body">
                         <h6 class="card-title">{{ product.name }}</h6>

@@ -19,11 +19,7 @@
     <!-- ЗАГОЛОВОК -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold mb-0">
-            {% if category %}
-                {{ category.name }}
-            {% else %}
-                Каталог одежды
-            {% endif %}
+            {% if category %}{{ category.name }}{% else %}Каталог одежды{% endif %}
         </h1>
         <span class="text-muted">{{ total_products }} товаров</span>
     </div>
@@ -35,7 +31,6 @@
                 <h5 class="filter-title"><i class="fas fa-filter me-2"></i>Фильтры</h5>
                 
                 <form method="get" id="filter-form">
-                    <!-- Поиск -->
                     {% if query %}
                     <input type="hidden" name="q" value="{{ query }}">
                     {% endif %}
@@ -81,9 +76,7 @@
                         <select name="size" class="form-select form-select-sm">
                             <option value="">Все размеры</option>
                             {% for size in all_sizes %}
-                            <option value="{{ size }}" {% if size_filter == size %}selected{% endif %}>
-                                {{ size }}
-                            </option>
+                            <option value="{{ size }}" {% if size_filter == size %}selected{% endif %}>{{ size }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -96,9 +89,7 @@
                         <select name="color" class="form-select form-select-sm">
                             <option value="">Все цвета</option>
                             {% for color in all_colors %}
-                            <option value="{{ color }}" {% if color_filter == color %}selected{% endif %}>
-                                {{ color }}
-                            </option>
+                            <option value="{{ color }}" {% if color_filter == color %}selected{% endif %}>{{ color }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -138,9 +129,7 @@
                     <select class="form-select form-select-sm d-inline-block w-auto" onchange="location = this.value;">
                         {% for value, label in sort_options.items %}
                         <option value="?{% if query %}q={{ query }}&{% endif %}sort={{ value }}" 
-                                {% if sort_by == value %}selected{% endif %}>
-                            {{ label }}
-                        </option>
+                                {% if sort_by == value %}selected{% endif %}>{{ label }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -158,7 +147,10 @@
                 <div class="col-6 col-md-4 mb-4">
                     <div class="product-card card h-100 border-0 shadow-sm">
                         <div class="position-relative">
-                            {% if product.image %}
+                            {% if product.image_url %}
+                            <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}"
+                                 style="height: 220px; object-fit: cover;">
+                            {% elif product.image %}
                             <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
                                  style="height: 220px; object-fit: cover;">
                             {% else %}
@@ -169,9 +161,7 @@
                             {% endif %}
                             
                             {% if product.is_new %}
-                            <div class="product-badge">
-                                <span class="badge-new">NEW</span>
-                            </div>
+                            <div class="product-badge"><span class="badge-new">NEW</span></div>
                             {% endif %}
                             
                             {% if product.is_sale %}
@@ -230,9 +220,7 @@
                     
                     {% for num in products.paginator.page_range %}
                         {% if products.number == num %}
-                        <li class="page-item active">
-                            <span class="page-link">{{ num }}</span>
-                        </li>
+                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                         {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
                         <li class="page-item">
                             <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
@@ -257,9 +245,7 @@
                 <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
                 <h3>Товары не найдены</h3>
                 <p class="text-muted">Попробуйте изменить параметры поиска или фильтры</p>
-                <a href="{% url 'shop:catalog' %}" class="btn btn-primary mt-3">
-                    Сбросить фильтры
-                </a>
+                <a href="{% url 'shop:catalog' %}" class="btn btn-primary mt-3">Сбросить фильтры</a>
             </div>
             {% endif %}
         </div>
