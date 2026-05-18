@@ -76,18 +76,46 @@
             </div>
         </div>
         
-        <!-- Навигация -->
+        <!-- Навигация с мобильным подменю -->
         <div class="header-nav-wrapper">
             <div class="container">
                 <nav class="header-nav" id="mainNav">
                     <button class="nav-close-btn d-lg-none" id="navCloseBtn"><i class="fas fa-times"></i></button>
                     <ul class="nav-menu">
-                        <li class="nav-item"><a href="#" class="nav-link mega-menu-trigger" data-menu="catalog">КАТАЛОГ <i class="fas fa-chevron-down ms-1"></i></a></li>
-                        <li class="nav-item"><a href="#" class="nav-link mega-menu-trigger" data-menu="collections">КОЛЛЕКЦИИ <i class="fas fa-chevron-down ms-1"></i></a></li>
+                        <!-- КАТАЛОГ -->
+                        <li class="nav-item nav-item-has-submenu">
+                            <a href="#" class="nav-link mega-menu-trigger submenu-toggle" data-menu="catalog" data-target="mobile-catalog">
+                                КАТАЛОГ <i class="fas fa-chevron-down ms-1"></i>
+                            </a>
+                            <ul class="mobile-submenu" id="mobile-catalog">
+                                <li><a href="{% url 'shop:catalog_category' 'women' %}">Женщинам</a></li>
+                                <li><a href="{% url 'shop:catalog_category' 'men' %}">Мужчинам</a></li>
+                                <li><a href="{% url 'shop:catalog_category' 'accessories' %}">Аксессуары</a></li>
+                                <li><a href="{% url 'shop:catalog_category' 'shoes' %}">Обувь</a></li>
+                            </ul>
+                        </li>
+                        <!-- КОЛЛЕКЦИИ -->
+                        <li class="nav-item nav-item-has-submenu">
+                            <a href="#" class="nav-link mega-menu-trigger submenu-toggle" data-menu="collections" data-target="mobile-collections">
+                                КОЛЛЕКЦИИ <i class="fas fa-chevron-down ms-1"></i>
+                            </a>
+                            <ul class="mobile-submenu" id="mobile-collections">
+                                <li><a href="{% url 'shop:catalog' %}?collection=basic">Базовая коллекция</a></li>
+                                <li><a href="{% url 'shop:catalog' %}?collection=evening">Вечерняя коллекция</a></li>
+                                <li><a href="{% url 'shop:catalog' %}?collection=sport">Спортивная коллекция</a></li>
+                                <li><a href="{% url 'shop:catalog' %}?season=spring-summer-2026">Весна-Лето 2026</a></li>
+                                <li><a href="{% url 'shop:catalog' %}?season=autumn-winter-2026">Осень-Зима 2026</a></li>
+                            </ul>
+                        </li>
                         <li class="nav-item"><a href="{% url 'shop:catalog' %}?new_only=1" class="nav-link">НОВИНКИ</a></li>
                         <li class="nav-item"><a href="{% url 'shop:catalog' %}?sale_only=1" class="nav-link sale-link">SALE</a></li>
                         <li class="nav-item"><a href="{% url 'shop:about' %}" class="nav-link">О БРЕНДЕ</a></li>
                     </ul>
+                    <div class="mobile-extra-links">
+                        <a href="{% url 'shop:delivery' %}" class="mobile-link">Доставка</a>
+                        <a href="{% url 'shop:contacts' %}" class="mobile-link">Контакты</a>
+                        <a href="{% url 'shop:login' %}" class="mobile-link">Войти / Регистрация</a>
+                    </div>
                 </nav>
             </div>
         </div>
@@ -289,12 +317,15 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // ========== МЕГА-МЕНЮ (ДЕСКТОП) ==========
             const triggers = document.querySelectorAll('.mega-menu-trigger');
             const menus = document.querySelectorAll('.mega-menu');
             let activeMenu = null, timeoutId = null;
             
             triggers.forEach(trigger => {
-                trigger.addEventListener('mouseenter', function() {
+                trigger.addEventListener('mouseenter', function(e) {
+                    // На мобильных не открываем мега-меню при наведении
+                    if (window.innerWidth < 992) return;
                     clearTimeout(timeoutId);
                     const menu = document.getElementById('mega-menu-' + this.dataset.menu);
                     if (activeMenu && activeMenu !== menu) activeMenu.classList.remove('active');
@@ -303,6 +334,7 @@
             });
             
             document.querySelector('.header-nav-wrapper').addEventListener('mouseleave', function() {
+                if (window.innerWidth < 992) return;
                 timeoutId = setTimeout(() => { if (activeMenu) { activeMenu.classList.remove('active'); activeMenu = null; } }, 300);
             });
             
@@ -311,6 +343,7 @@
                 menu.addEventListener('mouseleave', function() { this.classList.remove('active'); activeMenu = null; });
             });
             
+            // ========== МОБИЛЬНОЕ МЕНЮ ==========
             const mt = document.getElementById('mobileMenuToggle');
             const mn = document.getElementById('mainNav');
             const nc = document.getElementById('navCloseBtn');
@@ -323,6 +356,27 @@
                 }
             });
             
+            // ========== МОБИЛЬНОЕ ПОДМЕНЮ ==========
+            const submenuToggles = document.querySelectorAll('.submenu-toggle');
+            submenuToggles.forEach(toggle => {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.dataset.target;
+                    const submenu = document.getElementById(targetId);
+                    
+                    document.querySelectorAll('.mobile-submenu').forEach(sm => {
+                        if (sm !== submenu) sm.classList.remove('active');
+                    });
+                    document.querySelectorAll('.submenu-toggle').forEach(st => {
+                        if (st !== this) st.classList.remove('active');
+                    });
+                    
+                    this.classList.toggle('active');
+                    if (submenu) submenu.classList.toggle('active');
+                });
+            });
+            
+            // ========== ПОИСК ==========
             const si = document.querySelector('.search-input');
             const sc = document.getElementById('searchClearBtn');
             if (si && sc) {
@@ -330,6 +384,7 @@
                 sc.addEventListener('click', () => { si.value = ''; sc.style.display = 'none'; si.focus(); });
             }
             
+            // ========== СЧЕТЧИКИ ==========
             fetch('/api/header-info/').then(r => r.json()).then(d => {
                 const cb = document.getElementById('cart-count-badge');
                 const wb = document.getElementById('wishlist-count-badge');
@@ -340,6 +395,7 @@
     </script>
     
     <script>
+        // ========== СЖАТИЕ ШАПКИ ПРИ СКРОЛЛЕ ==========
         document.addEventListener('DOMContentLoaded', function() {
             const h = document.querySelector('.header-adeleide');
             const hm = document.querySelector('.header-main');
