@@ -2,9 +2,11 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="{% block meta_description %}SeeYouInside - интернет-магазин стильной и комфортной одежды{% endblock %}">
+    <meta name="keywords" content="одежда, интернет-магазин, SeeYouInside, купить одежду">
     <meta name="author" content="Некит Карина Руслановна">
+    
     <title>{% block title %}SeeYouInside - Магазин одежды{% endblock %}</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -58,17 +60,17 @@
                         </a>
                     </div>
                     <div class="header-right-section">
-                       <a href="{% url 'shop:wishlist_detail' %}" class="header-icon" title="Избранное">
-                        <i class="far fa-heart"></i>
-                        <span class="icon-badge wishlist-count" id="wishlist-count-badge">
-                            {{ wishlist_count|default:0 }}
-                        </span>
-                    </a>
+                        <a href="{% url 'shop:wishlist_detail' %}" class="header-icon" title="Избранное">
+                            <i class="far fa-heart"></i>
+                            <span class="icon-badge wishlist-count" id="wishlist-count-badge">0</span>
+                        </a>
                         <a href="{% url 'shop:cart_detail' %}" class="header-icon cart-icon" title="Корзина">
                             <i class="fas fa-shopping-cart"></i>
                             <span class="icon-badge" id="cart-count-badge">{{ cart_count|default:0 }}</span>
                         </a>
-                        <button class="mobile-menu-toggle d-lg-none" id="mobileMenuToggle"><i class="fas fa-bars"></i></button>
+                        <button class="mobile-menu-toggle d-lg-none" id="mobileMenuToggle">
+                            <i class="fas fa-bars"></i>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -217,7 +219,7 @@
         {% if messages %}
         <div class="container mt-3">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm" role="alert">
                 {{ message }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
@@ -234,7 +236,7 @@
                 <div class="row">
                     <div class="col-lg-3 col-md-6 mb-4">
                         <h5 class="footer-title">SEEYOUINSIDE</h5>
-                        <p class="footer-text">Стильная и комфортная одежда.</p>
+                        <p class="footer-text">Стильная и комфортная одежда для тех, кто ценит качество и уют.</p>
                         <div class="footer-social">
                             <a href="#"><i class="fab fa-vk"></i></a>
                             <a href="#"><i class="fab fa-telegram"></i></a>
@@ -266,12 +268,25 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="copyright">&copy; 2026 SeeYouInside. Дипломный проект Некит К.Р.</p>
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="copyright">&copy; 2026 SeeYouInside. Дипломный проект Некит К.Р.<br><small>КМЭПТ, группа О-П-922/3</small></p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <div class="payment-icons">
+                            <i class="fab fa-cc-visa"></i>
+                            <i class="fab fa-cc-mastercard"></i>
+                            <i class="fab fa-cc-mir"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </footer>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const triggers = document.querySelectorAll('.mega-menu-trigger');
@@ -296,11 +311,16 @@
                 menu.addEventListener('mouseleave', function() { this.classList.remove('active'); activeMenu = null; });
             });
             
-            document.getElementById('mobileMenuToggle')?.addEventListener('click', () => {
-                document.getElementById('mainNav').classList.add('active');
-            });
-            document.getElementById('navCloseBtn')?.addEventListener('click', () => {
-                document.getElementById('mainNav').classList.remove('active');
+            const mt = document.getElementById('mobileMenuToggle');
+            const mn = document.getElementById('mainNav');
+            const nc = document.getElementById('navCloseBtn');
+            if (mt) mt.addEventListener('click', () => { mn.classList.add('active'); document.body.style.overflow = 'hidden'; });
+            if (nc) nc.addEventListener('click', () => { mn.classList.remove('active'); document.body.style.overflow = ''; });
+            
+            document.addEventListener('click', function(e) {
+                if (mn && mn.classList.contains('active') && !mn.contains(e.target) && mt && !mt.contains(e.target)) {
+                    mn.classList.remove('active'); document.body.style.overflow = '';
+                }
             });
             
             const si = document.querySelector('.search-input');
@@ -310,12 +330,12 @@
                 sc.addEventListener('click', () => { si.value = ''; sc.style.display = 'none'; si.focus(); });
             }
             
-           fetch('/api/header-info/').then(r => r.json()).then(d => {
-    const cartBadge = document.getElementById('cart-count-badge');
-    const wishBadge = document.getElementById('wishlist-count-badge');
-    if (cartBadge) cartBadge.textContent = d.cart_count || 0;
-    if (wishBadge) wishBadge.textContent = d.wishlist_count || 0;
-}).catch(() => {});
+            fetch('/api/header-info/').then(r => r.json()).then(d => {
+                const cb = document.getElementById('cart-count-badge');
+                const wb = document.getElementById('wishlist-count-badge');
+                if (cb) cb.textContent = d.cart_count || 0;
+                if (wb) wb.textContent = d.wishlist_count || 0;
+            }).catch(() => {});
         });
     </script>
     
