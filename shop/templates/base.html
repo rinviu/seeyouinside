@@ -76,7 +76,7 @@
             </div>
         </div>
         
-        <!-- Навигация с мобильным подменю -->
+        <!-- Навигация -->
         <div class="header-nav-wrapper">
             <div class="container">
                 <nav class="header-nav" id="mainNav">
@@ -111,7 +111,8 @@
                         <li class="nav-item"><a href="{% url 'shop:catalog' %}?sale_only=1" class="nav-link sale-link">SALE</a></li>
                         <li class="nav-item"><a href="{% url 'shop:about' %}" class="nav-link">О БРЕНДЕ</a></li>
                     </ul>
-                    <div class="mobile-extra-links">
+                    <!-- Только на мобильных -->
+                    <div class="mobile-extra-links d-lg-none">
                         <a href="{% url 'shop:delivery' %}" class="mobile-link">Доставка</a>
                         <a href="{% url 'shop:contacts' %}" class="mobile-link">Контакты</a>
                         <a href="{% url 'shop:login' %}" class="mobile-link">Войти / Регистрация</a>
@@ -317,14 +318,13 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // ========== МЕГА-МЕНЮ (ДЕСКТОП) ==========
+            // МЕГА-МЕНЮ (ДЕСКТОП)
             const triggers = document.querySelectorAll('.mega-menu-trigger');
             const menus = document.querySelectorAll('.mega-menu');
             let activeMenu = null, timeoutId = null;
             
             triggers.forEach(trigger => {
                 trigger.addEventListener('mouseenter', function(e) {
-                    // На мобильных не открываем мега-меню при наведении
                     if (window.innerWidth < 992) return;
                     clearTimeout(timeoutId);
                     const menu = document.getElementById('mega-menu-' + this.dataset.menu);
@@ -343,40 +343,37 @@
                 menu.addEventListener('mouseleave', function() { this.classList.remove('active'); activeMenu = null; });
             });
             
-            // ========== МОБИЛЬНОЕ МЕНЮ ==========
+            // МОБИЛЬНОЕ МЕНЮ
             const mt = document.getElementById('mobileMenuToggle');
             const mn = document.getElementById('mainNav');
             const nc = document.getElementById('navCloseBtn');
             if (mt) mt.addEventListener('click', () => { mn.classList.add('active'); document.body.style.overflow = 'hidden'; });
             if (nc) nc.addEventListener('click', () => { mn.classList.remove('active'); document.body.style.overflow = ''; });
-            
             document.addEventListener('click', function(e) {
                 if (mn && mn.classList.contains('active') && !mn.contains(e.target) && mt && !mt.contains(e.target)) {
                     mn.classList.remove('active'); document.body.style.overflow = '';
                 }
             });
             
-            // ========== МОБИЛЬНОЕ ПОДМЕНЮ ==========
+            // МОБИЛЬНОЕ ПОДМЕНЮ
             const submenuToggles = document.querySelectorAll('.submenu-toggle');
             submenuToggles.forEach(toggle => {
                 toggle.addEventListener('click', function(e) {
                     e.preventDefault();
                     const targetId = this.dataset.target;
                     const submenu = document.getElementById(targetId);
-                    
                     document.querySelectorAll('.mobile-submenu').forEach(sm => {
                         if (sm !== submenu) sm.classList.remove('active');
                     });
                     document.querySelectorAll('.submenu-toggle').forEach(st => {
                         if (st !== this) st.classList.remove('active');
                     });
-                    
                     this.classList.toggle('active');
                     if (submenu) submenu.classList.toggle('active');
                 });
             });
             
-            // ========== ПОИСК ==========
+            // ПОИСК
             const si = document.querySelector('.search-input');
             const sc = document.getElementById('searchClearBtn');
             if (si && sc) {
@@ -384,7 +381,7 @@
                 sc.addEventListener('click', () => { si.value = ''; sc.style.display = 'none'; si.focus(); });
             }
             
-            // ========== СЧЕТЧИКИ ==========
+            // СЧЕТЧИКИ
             fetch('/api/header-info/').then(r => r.json()).then(d => {
                 const cb = document.getElementById('cart-count-badge');
                 const wb = document.getElementById('wishlist-count-badge');
@@ -395,7 +392,6 @@
     </script>
     
     <script>
-        // ========== СЖАТИЕ ШАПКИ ПРИ СКРОЛЛЕ ==========
         document.addEventListener('DOMContentLoaded', function() {
             const h = document.querySelector('.header-adeleide');
             const hm = document.querySelector('.header-main');

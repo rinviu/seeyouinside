@@ -2456,3 +2456,74 @@ body {
         margin-top: 12px;
     }
 }
+
+/* ============================================
+ * МОБИЛЬНОЕ ПОДМЕНЮ (внутри бургер-меню)
+ * ============================================ */
+
+@media (max-width: 992px) {
+    .nav-item-has-submenu {
+        position: relative;
+    }
+
+    .submenu-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+
+    .submenu-toggle .fa-chevron-down {
+        transition: transform 0.3s ease;
+        font-size: 12px;
+    }
+
+    .submenu-toggle.active .fa-chevron-down {
+        transform: rotate(180deg);
+    }
+
+    .mobile-submenu {
+        display: none;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        background-color: #fafafa;
+    }
+
+    .mobile-submenu.active {
+        display: block;
+    }
+
+    .mobile-submenu li {
+        border-bottom: 1px solid #eee;
+    }
+
+    .mobile-submenu li:last-child {
+        border-bottom: none;
+    }
+
+    .mobile-submenu a {
+        display: block;
+        padding: 14px 35px;
+        font-size: 13px;
+        color: #666;
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        transition: all 0.2s ease;
+    }
+
+    .mobile-submenu a:hover {
+        background-color: #fff;
+        color: var(--accent-color);
+    }
+}
+
+/* Скрываем мобильные элементы на десктопе */
+@media (min-width: 993px) {
+
+    .mobile-submenu,
+    .mobile-extra-links {
+        display: none !important;
+    }
+}
