@@ -35,15 +35,9 @@
             {% for product in new_products %}
             <div class="product-card-minimal">
                 <a href="{% url 'shop:product_detail' product.id product.slug %}" class="product-image-link">
-                    {% if product.image_url %}
-                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
-                    {% elif product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                    {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 3/4;">
-                        <i class="fas fa-image fa-3x text-muted"></i>
-                    </div>
-                    {% endif %}
+                    <!-- ИСПРАВЛЕНО: используем get_image_url -->
+                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="product-image"
+                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                     {% if product.is_new %}
                     <span class="product-badge-new">NEW</span>
                     {% endif %}
@@ -51,7 +45,14 @@
                 <div class="product-info">
                     <h3 class="product-name">{{ product.name }}</h3>
                     <p class="product-category">{{ product.category.name }}</p>
+                    {% if product.is_sale %}
+                    <p class="product-price">
+                        <span class="old-price">{{ product.price }} ₽</span>
+                        <span class="sale-price">{{ product.sale_price }} ₽</span>
+                    </p>
+                    {% else %}
                     <p class="product-price">{{ product.price }} ₽</p>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -86,15 +87,9 @@
             {% for product in popular_products %}
             <div class="product-card-minimal">
                 <a href="{% url 'shop:product_detail' product.id product.slug %}" class="product-image-link">
-                    {% if product.image_url %}
-                    <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
-                    {% elif product.image %}
-                    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
-                    {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" style="aspect-ratio: 3/4;">
-                        <i class="fas fa-image fa-3x text-muted"></i>
-                    </div>
-                    {% endif %}
+                    <!-- ИСПРАВЛЕНО: используем get_image_url -->
+                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="product-image"
+                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                 </a>
                 <div class="product-info">
                     <h3 class="product-name">{{ product.name }}</h3>

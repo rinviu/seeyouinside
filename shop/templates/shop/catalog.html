@@ -147,10 +147,10 @@
                 <div class="col-6 col-md-4 mb-4">
                     <div class="product-card card h-100 border-0 shadow-sm">
                         <div class="position-relative">
-                            <!-- ФОТО ТОВАРА С ЗАЩИТОЙ ОТ ОШИБОК -->
+                            <!-- ФОТО ТОВАРА - ИСПРАВЛЕНО -->
                             <img src="{{ product.get_image_url }}" class="card-img-top" alt="{{ product.name }}"
                                  style="height: 220px; object-fit: cover;"
-                                 onerror="this.onerror=null; this.src='/static/shop/img/placeholder.jpg';">
+                                 onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                             
                             {% if product.is_new %}
                             <div class="product-badge"><span class="badge-new">NEW</span></div>
@@ -169,8 +169,8 @@
                             
                             {% if product.is_sale %}
                             <div class="mb-2">
-                                <span class="old-price small">{{ product.price }} ₽</span>
-                                <span class="fw-bold text-danger">{{ product.sale_price }} ₽</span>
+                                <span class="old-price small text-muted text-decoration-line-through">{{ product.price }} ₽</span>
+                                <span class="fw-bold text-danger ms-2">{{ product.sale_price }} ₽</span>
                             </div>
                             {% else %}
                             <div class="mb-2">
