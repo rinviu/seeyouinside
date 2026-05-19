@@ -373,14 +373,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // ИНИЦИАЛИЗАЦИЯ
     // ============================================================
     console.log('SeeYouInside - интернет-магазин запущен');
+    function updateCartInfo() {
+        fetch('/api/header-info/')
+            .then(response => response.json())
+            .then(data => {
+                const cartCount = document.getElementById('cart-count-badge');
+                if (cartCount) cartCount.textContent = data.cart_count || 0;
 
-    // Получаем актуальное количество товаров в корзине
-    fetch('/api/header-info/')
-        .then(response => response.json())
-        .then(data => {
-            updateCartCount(data.cart_count);
-        })
-        .catch(error => {
-            console.error('Error fetching cart info:', error);
-        });
+                const wishlistCount = document.getElementById('wishlist-count-badge');
+                if (wishlistCount) wishlistCount.textContent = data.wishlist_count || 0;
+            })
+            .catch(error => console.error('Error fetching cart info:', error));
+    }
 });
