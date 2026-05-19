@@ -147,8 +147,8 @@
                 <div class="col-6 col-md-4 mb-4">
                     <div class="product-card card h-100 border-0 shadow-sm">
                         <div class="position-relative">
-                            <!-- ФОТО ТОВАРА - ИСПРАВЛЕНО -->
-                            <img src="{{ product.get_image_url }}" class="card-img-top" alt="{{ product.name }}"
+                            <!-- ФОТО ТОВАРА - ТОЛЬКО ИЗ STATIC -->
+                            <img src="/static/products/{{ product.slug }}.jpg" class="card-img-top" alt="{{ product.name }}"
                                  style="height: 220px; object-fit: cover;"
                                  onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                             

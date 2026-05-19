@@ -107,12 +107,12 @@ class Product(models.Model):
     color = models.CharField(max_length=50, blank=True, null=True, verbose_name="Цвет")
     material = models.CharField(max_length=200, blank=True, null=True, verbose_name="Состав/материал")
     
-    # Загружаемые фото
+    # Загружаемые фото (оставляем, но НЕ ИСПОЛЬЗУЕМ)
     image = models.ImageField(upload_to='products/%Y/%m/%d/', verbose_name="Главное фото товара", blank=True, null=True)
     image_2 = models.ImageField(upload_to='products/%Y/%m/%d/', blank=True, null=True, verbose_name="Дополнительное фото 1")
     image_3 = models.ImageField(upload_to='products/%Y/%m/%d/', blank=True, null=True, verbose_name="Дополнительное фото 2")
     
-    # Ссылки на фото из внешних источников (Telegram, Imgur, PostImages)
+    # Ссылки на фото из внешних источников (оставляем, но НЕ ИСПОЛЬЗУЕМ)
     image_url = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на главное фото")
     image_url_2 = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото 2")
     image_url_3 = models.URLField(max_length=500, blank=True, null=True, verbose_name="Ссылка на фото 3")
@@ -125,6 +125,67 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата добавления")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Дата обновления")
     views_count = models.PositiveIntegerField(default=0, verbose_name="Количество просмотров")
+    
+    class Meta:
+        verbose_name = "Товар"
+        verbose_name_plural = "Товары"
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['id', 'slug']),
+            models.Index(fields=['name']),
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['gender']),
+            models.Index(fields=['subcategory']),
+            models.Index(fields=['collection']),
+        ]
+    
+    def __str__(self):
+        return f"{self.name} - {self.price}₽"
+    
+    def get_absolute_url(self):
+        return reverse('shop:product_detail', args=[self.id, self.slug])
+    
+    def get_sizes_list(self):
+        if self.size:
+            return [s.strip() for s in self.size.split(',')]
+        return []
+    
+    def get_current_price(self):
+        if self.is_sale and self.sale_price:
+            return self.sale_price
+        return self.price
+    
+    def get_discount_percent(self):
+        if self.is_sale and self.sale_price:
+            return int(((self.price - self.sale_price) / self.price) * 100)
+        return 0
+    
+    # ========== НОВЫЕ МЕТОДЫ - ИГНОРИРУЕМ MEDIA ==========
+    
+    def get_image_url(self):
+        """
+        Главное фото - ТОЛЬКО из статики
+        Игнорируем image, image_2, image_3, image_url
+        """
+        return f'/static/products/{self.slug}.jpg'
+    
+    def get_image_2_url(self):
+        """
+        Второе фото - ТОЛЬКО из статики
+        """
+        return f'/static/products/{self.slug}-2.jpg'
+    
+    def get_image_3_url(self):
+        """
+        Третье фото - не используем
+        """
+        return None
+    
+    def has_second_image(self):
+        """Проверяет, есть ли второе фото (по факту существования файла)"""
+        # Просто возвращаем True, если нужно показывать второе фото
+        # HTML сам проверит через onerror
+        return True
     
     class Meta:
         verbose_name = "Товар"

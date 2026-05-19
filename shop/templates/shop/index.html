@@ -36,8 +36,8 @@
             <div class="product-card-minimal">
                 <a href="{% url 'shop:product_detail' product.id product.slug %}" class="product-image-link">
                     <!-- ИСПРАВЛЕНО: используем get_image_url -->
-                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="product-image"
-                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
+                    <img src="/static/products/{{ product.slug }}.jpg" alt="{{ product.name }}" class="product-image"
+                    onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                     {% if product.is_new %}
                     <span class="product-badge-new">NEW</span>
                     {% endif %}
@@ -88,8 +88,8 @@
             <div class="product-card-minimal">
                 <a href="{% url 'shop:product_detail' product.id product.slug %}" class="product-image-link">
                     <!-- ИСПРАВЛЕНО: используем get_image_url -->
-                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" class="product-image"
-                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
+                    <img src="/static/products/{{ product.slug }}.jpg" alt="{{ product.name }}" class="product-image"
+                    onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                 </a>
                 <div class="product-info">
                     <h3 class="product-name">{{ product.name }}</h3>

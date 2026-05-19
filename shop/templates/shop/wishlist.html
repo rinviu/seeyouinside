@@ -14,8 +14,8 @@
             <div class="product-card-minimal">
                 <a href="{% url 'shop:product_detail' item.product.id item.product.slug %}" class="product-image-link">
                     <!-- ИСПРАВЛЕНО: используем get_image_url -->
-                    <img src="{{ item.product.get_image_url }}" alt="{{ item.product.name }}" class="product-image"
-                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
+                    <img src="/static/products/{{ item.product.slug }}.jpg" alt="{{ item.product.name }}" class="product-image"
+                    onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                     {% if item.product.is_new %}
                     <span class="product-badge-new">NEW</span>
                     {% endif %}
