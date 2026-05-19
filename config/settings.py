@@ -44,7 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # ← ДОБАВЛЕНО СРАЗУ
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -94,6 +94,10 @@ if DATABASE_URL:
     # Продакшен: PostgreSQL на Render
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
+    }
+    # SSL для Render
+    DATABASES['default']['OPTIONS'] = {
+        'sslmode': 'require',
     }
 else:
     # Разработка: SQLite локально
