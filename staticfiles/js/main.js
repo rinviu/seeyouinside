@@ -375,7 +375,7 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('SeeYouInside - интернет-магазин запущен');
 
     // Получаем актуальное количество товаров в корзине
-    fetch('/api/cart-info/')
+    fetch('/api/header-info/')
         .then(response => response.json())
         .then(data => {
             updateCartCount(data.cart_count);
