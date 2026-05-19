@@ -196,25 +196,9 @@ def product_detail(request, id, slug):
     related_products = Product.objects.filter(category=product.category, available=True).exclude(id=product.id).order_by('-views_count')[:4]
     sizes = product.get_sizes_list()
     
-    # Изображения: сначала URL-ссылки, потом загруженные файлы
-    images = []
-    if product.image_url:
-        images.append({'url': product.image_url, 'alt': product.name, 'is_main': True})
-    elif product.image:
-        images.append({'url': product.image.url, 'alt': product.name, 'is_main': True})
-    if product.image_url_2:
-        images.append({'url': product.image_url_2, 'alt': f'{product.name} - вид 2', 'is_main': False})
-    elif product.image_2:
-        images.append({'url': product.image_2.url, 'alt': f'{product.name} - вид 2', 'is_main': False})
-    if product.image_url_3:
-        images.append({'url': product.image_url_3, 'alt': f'{product.name} - вид 3', 'is_main': False})
-    elif product.image_3:
-        images.append({'url': product.image_3.url, 'alt': f'{product.name} - вид 3', 'is_main': False})
-    
     in_cart = False
     in_wishlist = False
     if request.user.is_authenticated:
-        in_cart = CartItem.objects.filter(user=request.user, product=product).exists()
         in_wishlist = WishlistItem.objects.filter(user=request.user, product=product).exists()
     
     specifications = []
@@ -224,8 +208,8 @@ def product_detail(request, id, slug):
     if product.size: specifications.append({'name': 'Размеры', 'value': product.size})
     
     context = {
-        'product': product, 'sizes': sizes, 'images': images,
-        'related_products': related_products, 'in_cart': in_cart,
+        'product': product, 'sizes': sizes,
+        'related_products': related_products,
         'in_wishlist': in_wishlist, 'specifications': specifications,
         'page_title': f'{product.name} | SeeYouInside',
     }
@@ -233,11 +217,10 @@ def product_detail(request, id, slug):
 
 
 # ============================================================
-# ЛОГИКА КОРЗИНЫ (ИСПРАВЛЕННАЯ)
+# ЛОГИКА КОРЗИНЫ
 # ============================================================
 
 def get_cart_id(request):
-    """Получить или создать ID корзины для сессии"""
     cart_id = request.session.get('cart_id')
     if not cart_id:
         request.session.create()
@@ -247,146 +230,131 @@ def get_cart_id(request):
 
 
 def get_cart_items(request):
-    """Получить все товары в корзине"""
     if request.user.is_authenticated:
         return CartItem.objects.filter(user=request.user).select_related('product', 'product__category')
     return CartItem.objects.filter(session_key=get_cart_id(request)).select_related('product', 'product__category')
 
 
 def get_cart_count(request):
-    """Получить количество товаров в корзине"""
     return sum(item.quantity for item in get_cart_items(request))
 
 
 def get_cart_total(request):
-    """Получить общую сумму корзины"""
     return sum(item.total_price() for item in get_cart_items(request))
 
 
 @require_POST
 def cart_add(request, product_id):
-    """Добавление товара в корзину (ИСПРАВЛЕНО)"""
-    product = get_object_or_404(Product, id=product_id, available=True)
+    """Добавление товара в корзину (обычная отправка)"""
+    product = get_object_or_404(Product, id=product_id)
+    if not product.available:
+        messages.error(request, 'Товар недоступен')
+        return redirect('shop:product_detail', id=product.id, slug=product.slug)
     
-    # Получаем данные из формы
     size = request.POST.get('size', '').strip()
-    quantity = int(request.POST.get('quantity', 1))
+    quantity = min(max(int(request.POST.get('quantity', 1)), 1), 10)
     
-    # Ограничиваем количество
-    quantity = max(1, min(quantity, 10))
-    
-    # Для неавторизованных пользователей - проверка через сессию
-    if not request.user.is_authenticated:
-        cart_id = get_cart_id(request)
-        
-        # Ищем товар с таким же product_id и размером
-        existing_item = CartItem.objects.filter(
-            session_key=cart_id, 
+    if request.user.is_authenticated:
+        cart_item, created = CartItem.objects.get_or_create(
+            user=request.user, 
             product=product, 
-            size_selected=size if size else None
-        ).first()
-        
-        if existing_item:
-            existing_item.quantity = min(existing_item.quantity + quantity, 10)
-            existing_item.save()
-        else:
-            CartItem.objects.create(
-                session_key=cart_id,
-                product=product,
-                quantity=quantity,
-                size_selected=size if size else None
-            )
+            size_selected=size or None, 
+            defaults={'quantity': quantity}
+        )
     else:
-        # Для авторизованных пользователей
-        existing_item = CartItem.objects.filter(
-            user=request.user,
-            product=product,
-            size_selected=size if size else None
-        ).first()
-        
-        if existing_item:
-            existing_item.quantity = min(existing_item.quantity + quantity, 10)
-            existing_item.save()
-        else:
-            CartItem.objects.create(
-                user=request.user,
-                product=product,
-                quantity=quantity,
-                size_selected=size if size else None
-            )
+        cart_item, created = CartItem.objects.get_or_create(
+            session_key=get_cart_id(request), 
+            product=product, 
+            size_selected=size or None, 
+            defaults={'quantity': quantity}
+        )
+    
+    if not created:
+        cart_item.quantity = min(cart_item.quantity + quantity, 10)
+        cart_item.save()
     
     messages.success(request, f'✅ "{product.name}" добавлен в корзину')
-    
-    # Возвращаемся на страницу товара
     return redirect('shop:product_detail', id=product.id, slug=product.slug)
 
 
+@require_POST
+def cart_add_ajax(request, product_id):
+    """Добавление товара в корзину через AJAX (возвращает JSON)"""
+    product = get_object_or_404(Product, id=product_id, available=True)
+    
+    size = request.POST.get('size', '').strip()
+    quantity = int(request.POST.get('quantity', 1))
+    quantity = max(1, min(quantity, 10))
+    
+    # Поиск существующего товара в корзине
+    if request.user.is_authenticated:
+        cart_item, created = CartItem.objects.get_or_create(
+            user=request.user,
+            product=product,
+            size_selected=size if size else None,
+            defaults={'quantity': quantity}
+        )
+    else:
+        cart_id = get_cart_id(request)
+        cart_item, created = CartItem.objects.get_or_create(
+            session_key=cart_id,
+            product=product,
+            size_selected=size if size else None,
+            defaults={'quantity': quantity}
+        )
+    
+    if not created:
+        cart_item.quantity = min(cart_item.quantity + quantity, 10)
+        cart_item.save()
+    
+    return JsonResponse({
+        'success': True,
+        'message': f'{product.name} добавлен в корзину',
+        'cart_count': get_cart_count(request),
+        'cart_total': str(get_cart_total(request))
+    })
+
+
 def cart_detail(request):
-    """Страница корзины"""
     cart_items = get_cart_items(request)
     cart_total = sum(item.total_price() for item in cart_items)
     cart_count = sum(item.quantity for item in cart_items)
-    
-    # Сохраняем в сессию для отображения в шапке
     request.session['cart_count'] = cart_count
     
-    # Рекомендуемые товары
     recommended_products = []
     if cart_items:
-        categories = set(item.product.category_id for item in cart_items)
-        product_ids = [item.product_id for item in cart_items]
-        recommended_products = Product.objects.filter(
-            category_id__in=categories, 
-            available=True
-        ).exclude(id__in=product_ids).order_by('-views_count')[:4]
+        cats = set(item.product.category_id for item in cart_items)
+        recommended_products = Product.objects.filter(category_id__in=cats, available=True).exclude(id__in=[item.product_id for item in cart_items]).order_by('-views_count')[:4]
     
-    context = {
-        'cart_items': cart_items,
-        'cart_total': cart_total,
-        'cart_count': cart_count,
-        'recommended_products': recommended_products,
-        'page_title': 'Корзина | SeeYouInside',
-    }
-    return render(request, 'shop/cart.html', context)
+    return render(request, 'shop/cart.html', {'cart_items': cart_items, 'cart_total': cart_total, 'cart_count': cart_count, 'recommended_products': recommended_products, 'page_title': 'Корзина | SeeYouInside'})
 
 
 @require_POST
 def cart_update(request, item_id):
-    """Обновление количества товара в корзине"""
     cart_item = get_object_or_404(CartItem, id=item_id)
     action = request.POST.get('action')
-    
     if action == 'increase' and cart_item.quantity < 10:
-        cart_item.quantity += 1
-        cart_item.save()
-        messages.success(request, 'Количество увеличено')
+        cart_item.quantity += 1; cart_item.save()
     elif action == 'decrease':
         cart_item.quantity -= 1
-        if cart_item.quantity <= 0:
-            cart_item.delete()
-            messages.success(request, 'Товар удалён из корзины')
-        else:
-            cart_item.save()
-            messages.success(request, 'Количество уменьшено')
-    
+        if cart_item.quantity <= 0: cart_item.delete()
+        else: cart_item.save()
     return redirect('shop:cart_detail')
 
 
 @require_POST
 def cart_remove(request, item_id):
-    """Удаление товара из корзины"""
-    cart_item = get_object_or_404(CartItem, id=item_id)
-    product_name = cart_item.product.name
-    cart_item.delete()
-    messages.success(request, f'🗑️ "{product_name}" удалён из корзины')
+    get_object_or_404(CartItem, id=item_id).delete()
+    messages.success(request, 'Товар удалён из корзины')
     return redirect('shop:cart_detail')
 
 
 def cart_clear(request):
-    """Очистка корзины"""
     get_cart_items(request).delete()
     messages.success(request, 'Корзина очищена')
     return redirect('shop:cart_detail')
+
+
 # ============================================================
 # ЛОГИКА ИЗБРАННОГО
 # ============================================================
@@ -491,7 +459,7 @@ def delivery(request): return render(request, 'shop/delivery.html', {'page_title
 @require_POST
 def quick_view(request, product_id):
     product = get_object_or_404(Product, id=product_id, available=True)
-    html = f'<div class="quick-view"><div class="row"><div class="col-md-6"><img src="{product.image.url}" class="img-fluid" alt="{product.name}"></div><div class="col-md-6"><h4>{product.name}</h4><p class="price">{product.get_current_price()} ₽</p><p class="description">{product.description[:200]}...</p><a href="{product.get_absolute_url()}" class="btn btn-dark w-100">Подробнее</a></div></div></div>'
+    html = f'<div class="quick-view"><div class="row"><div class="col-md-6"><img src="/static/products/{product.slug}.jpg" class="img-fluid" alt="{product.name}"></div><div class="col-md-6"><h4>{product.name}</h4><p class="price">{product.get_current_price()} ₽</p><p class="description">{product.description[:200]}...</p><a href="{product.get_absolute_url()}" class="btn btn-dark w-100">Подробнее</a></div></div></div>'
     return JsonResponse({'success': True, 'html': html})
 
 

@@ -120,7 +120,7 @@
             
             <!-- ФОРМА ДОБАВЛЕНИЯ В КОРЗИНУ -->
             {% if product.available %}
-            <form action="{% url 'shop:cart_add' product.id %}" method="post" class="add-to-cart-form mb-3">
+           <form action="{% url 'shop:cart_add' product.id %}" method="post" class="add-to-cart-form mb-3">
                 {% csrf_token %}
                 
                 {% if product.get_sizes_list %}

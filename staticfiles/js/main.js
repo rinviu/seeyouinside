@@ -3,7 +3,6 @@
  * Дипломный проект Некит Карины Руслановны
  */
 
-// Ждем загрузки DOM
 document.addEventListener('DOMContentLoaded', function () {
 
     // ============================================================
@@ -126,30 +125,24 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Обновляем отображение
                     if (data.item_quantity === 0) {
-                        // Товар удален - перезагружаем страницу
                         location.reload();
                     } else {
-                        // Обновляем количество
                         const quantityElement = document.querySelector(`#quantity-${itemId}`);
                         if (quantityElement) {
                             quantityElement.textContent = data.item_quantity;
                         }
 
-                        // Обновляем сумму позиции
                         const itemTotalElement = document.querySelector(`#item-total-${itemId}`);
                         if (itemTotalElement) {
                             itemTotalElement.textContent = data.item_total + ' ₽';
                         }
 
-                        // Обновляем общую сумму
                         const cartTotalElement = document.querySelector('#cart-total');
                         if (cartTotalElement) {
                             cartTotalElement.textContent = data.cart_total + ' ₽';
                         }
 
-                        // Обновляем счетчик
                         updateCartCount(data.cart_count);
                     }
                 }
@@ -208,7 +201,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // УВЕДОМЛЕНИЯ (TOAST)
     // ============================================================
     function showToast(message, type = 'info') {
-        // Создаем контейнер для уведомлений, если его нет
         let container = document.querySelector('.toast-container');
         if (!container) {
             container = document.createElement('div');
@@ -217,18 +209,14 @@ document.addEventListener('DOMContentLoaded', function () {
             document.body.appendChild(container);
         }
 
-        // Создаем уведомление
         const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : type} border-0`;
+        toast.className = `toast align-items-center text-white bg-${type === 'error' ? 'danger' : 'success'} border-0`;
         toast.setAttribute('role', 'alert');
-        toast.setAttribute('aria-live', 'assertive');
-        toast.setAttribute('aria-atomic', 'true');
 
         toast.innerHTML = `
             <div class="d-flex">
                 <div class="toast-body">
-                    ${type === 'success' ? '<i class="fas fa-check-circle me-2"></i>' : ''}
-                    ${type === 'error' ? '<i class="fas fa-exclamation-circle me-2"></i>' : ''}
+                    <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'} me-2"></i>
                     ${message}
                 </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
@@ -236,20 +224,9 @@ document.addEventListener('DOMContentLoaded', function () {
         `;
 
         container.appendChild(toast);
-
-        // Инициализируем Bootstrap Toast
-        const bsToast = new bootstrap.Toast(toast, {
-            animation: true,
-            autohide: true,
-            delay: 3000
-        });
-
+        const bsToast = new bootstrap.Toast(toast, { animation: true, autohide: true, delay: 3000 });
         bsToast.show();
-
-        // Удаляем после скрытия
-        toast.addEventListener('hidden.bs.toast', function () {
-            toast.remove();
-        });
+        toast.addEventListener('hidden.bs.toast', () => toast.remove());
     }
 
     // ============================================================
@@ -306,13 +283,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let isValid = true;
 
-            // Проверка телефона
             if (phone && !phone.value.match(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)) {
                 showToast('Введите корректный номер телефона', 'error');
                 isValid = false;
             }
 
-            // Проверка email
             if (email && !email.value.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
                 showToast('Введите корректный email', 'error');
                 isValid = false;
@@ -335,8 +310,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const imageUrl = this.dataset.imageUrl;
             if (mainImage && imageUrl) {
                 mainImage.src = imageUrl;
-
-                // Обновляем активный класс
                 thumbnails.forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
             }
@@ -361,7 +334,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     fetch(`/api/search-suggestions/?q=${encodeURIComponent(query)}`)
                         .then(response => response.json())
                         .then(data => {
-                            // Здесь можно реализовать отображение подсказок
                             console.log('Suggestions:', data.suggestions);
                         });
                 }, 300);
@@ -370,19 +342,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ============================================================
-    // ИНИЦИАЛИЗАЦИЯ
+    // ОБНОВЛЕНИЕ ИНФОРМАЦИИ О КОРЗИНЕ
     // ============================================================
-    console.log('SeeYouInside - интернет-магазин запущен');
     function updateCartInfo() {
         fetch('/api/header-info/')
             .then(response => response.json())
             .then(data => {
                 const cartCount = document.getElementById('cart-count-badge');
                 if (cartCount) cartCount.textContent = data.cart_count || 0;
-
                 const wishlistCount = document.getElementById('wishlist-count-badge');
                 if (wishlistCount) wishlistCount.textContent = data.wishlist_count || 0;
             })
             .catch(error => console.error('Error fetching cart info:', error));
     }
+
+    // ============================================================
+    // ИНИЦИАЛИЗАЦИЯ
+    // ============================================================
+    console.log('SeeYouInside - интернет-магазин запущен');
+    updateCartInfo();
 });
