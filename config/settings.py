@@ -95,10 +95,6 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(DATABASE_URL)
     }
-    # SSL для Render
-    DATABASES['default']['OPTIONS'] = {
-        'sslmode': 'require',
-    }
 else:
     # Разработка: SQLite локально
     DATABASES = {
@@ -234,7 +230,6 @@ LOGGING = {
 # ============================================================
 # БЕЗОПАСНОСТЬ (продакшен)
 # ============================================================
-# Авто-миграции при деплое (только на Render)
 
 if not DEBUG:
     SECURE_SSL_REDIRECT = True
