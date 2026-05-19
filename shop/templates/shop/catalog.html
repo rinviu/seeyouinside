@@ -147,12 +147,11 @@
                 <div class="col-6 col-md-4 mb-4">
                     <div class="product-card card h-100 border-0 shadow-sm">
                         <div class="position-relative">
-                            {% if product.image_url %}
-                            <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}"
-                                 style="height: 220px; object-fit: cover;">
-                            {% elif product.image %}
-                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
-                                 style="height: 220px; object-fit: cover;">
+                            <!-- ОБНОВЛЕННЫЙ БЛОК С ИЗОБРАЖЕНИЕМ -->
+                            {% if product.get_image_url %}
+                            <img src="{{ product.get_image_url }}" class="card-img-top" alt="{{ product.name }}"
+                                 style="height: 220px; object-fit: cover;"
+                                 onerror="this.onerror=null; this.src='/static/shop/img/placeholder.jpg';">
                             {% else %}
                             <div class="bg-light d-flex align-items-center justify-content-center" 
                                  style="height: 220px;">
