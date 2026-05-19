@@ -16,27 +16,15 @@
             <div class="card shadow-sm">
                 <div class="card-body p-0">
                     {% for item in cart_items %}
-                    <div class="cart-item p-3">
-                        <!-- Изображение -->
-                        {% if item.product.image_url %}
-                        <img src="{{ item.product.image_url }}" 
+                    <div class="cart-item p-3 d-flex align-items-center">
+                        <!-- Изображение - ИСПРАВЛЕНО -->
+                        <img src="/static/products/{{ item.product.slug }}.jpg" 
                              alt="{{ item.product.name }}" 
-                             class="cart-item-image"
-                             style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                        {% elif item.product.image %}
-                        <img src="{{ item.product.image.url }}" 
-                             alt="{{ item.product.name }}" 
-                             class="cart-item-image"
-                             style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
-                        {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center" 
-                             style="width: 100px; height: 100px; border-radius: 8px; margin-right: 20px; flex-shrink: 0;">
-                            <i class="fas fa-image fa-2x text-muted"></i>
-                        </div>
-                        {% endif %}
+                             style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px; margin-right: 20px; flex-shrink: 0;"
+                             onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                         
                         <!-- Информация -->
-                        <div class="cart-item-info">
+                        <div class="cart-item-info flex-grow-1">
                             <h5 class="cart-item-title">
                                 <a href="{% url 'shop:product_detail' item.product.id item.product.slug %}" 
                                    class="text-decoration-none text-dark">
@@ -46,18 +34,18 @@
                             {% if item.size_selected %}
                             <p class="text-muted small mb-1">Размер: {{ item.size_selected }}</p>
                             {% endif %}
-                            <p class="cart-item-price">{{ item.product.get_current_price }} ₽</p>
+                            <p class="cart-item-price mb-0">{{ item.product.get_current_price }} ₽</p>
                         </div>
                         
                         <!-- Количество -->
-                        <div class="cart-item-quantity">
+                        <div class="cart-item-quantity mx-4">
                             <form action="{% url 'shop:cart_update' item.id %}" method="post" class="d-flex align-items-center">
                                 {% csrf_token %}
-                                <button type="submit" name="action" value="decrease" class="quantity-btn">
+                                <button type="submit" name="action" value="decrease" class="quantity-btn btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-minus"></i>
                                 </button>
-                                <span class="mx-3 fw-bold" id="quantity-{{ item.id }}">{{ item.quantity }}</span>
-                                <button type="submit" name="action" value="increase" class="quantity-btn">
+                                <span class="mx-3 fw-bold">{{ item.quantity }}</span>
+                                <button type="submit" name="action" value="increase" class="quantity-btn btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </form>
@@ -65,7 +53,7 @@
                         
                         <!-- Сумма и удаление -->
                         <div class="text-end ms-4">
-                            <div class="fw-bold fs-5 mb-2" id="item-total-{{ item.id }}">
+                            <div class="fw-bold fs-5 mb-2">
                                 {{ item.total_price }} ₽
                             </div>
                             <form action="{% url 'shop:cart_remove' item.id %}" method="post" style="display: inline;">
@@ -100,12 +88,12 @@
         
         <!-- ИТОГО -->
         <div class="col-lg-4">
-            <div class="cart-summary shadow-sm">
+            <div class="cart-summary shadow-sm p-4 rounded">
                 <h5 class="fw-bold mb-4">Ваш заказ</h5>
                 
                 <div class="d-flex justify-content-between mb-2">
                     <span>Товары ({{ cart_count }} шт.)</span>
-                    <span id="cart-total">{{ cart_total }} ₽</span>
+                    <span>{{ cart_total }} ₽</span>
                 </div>
                 
                 <hr>
@@ -141,18 +129,9 @@
             {% for product in recommended_products %}
             <div class="col-6 col-md-3 mb-4">
                 <div class="product-card card h-100 border-0 shadow-sm">
-                    {% if product.image_url %}
-                    <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}"
-                         style="height: 180px; object-fit: cover;">
-                    {% elif product.image %}
-                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
-                         style="height: 180px; object-fit: cover;">
-                    {% else %}
-                    <div class="bg-light d-flex align-items-center justify-content-center" 
-                         style="height: 180px;">
-                        <i class="fas fa-image fa-3x text-muted"></i>
-                    </div>
-                    {% endif %}
+                    <img src="/static/products/{{ product.slug }}.jpg" class="card-img-top" alt="{{ product.name }}"
+                         style="height: 180px; object-fit: cover;"
+                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                     <div class="card-body">
                         <h6 class="card-title">{{ product.name }}</h6>
                         <p class="card-text fw-bold text-primary">{{ product.price }} ₽</p>

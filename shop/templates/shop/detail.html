@@ -24,46 +24,33 @@
         <div class="col-lg-6 mb-4">
             <div class="product-gallery-slider">
                 <div class="gallery-main">
-                    <!-- СБОР ВСЕХ ФОТО ТОВАРА -->
-                    {% with main_photo=product.get_image_url second_photo=product.get_image_2_url %}
+                    <!-- Главное фото - ПРЯМОЙ ПУТЬ -->
+                    <img src="/static/products/{{ product.slug }}.jpg" alt="{{ product.name }}" 
+                         class="gallery-slide active" data-index="0" id="mainProductImage"
+                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                     
-                    <!-- Главное фото всегда есть -->
-                    <img src="{{ main_photo }}" alt="{{ product.name }}" 
-                         class="gallery-slide active" data-index="0"
-                         onerror="this.onerror=null; this.src='/static/shop/img/placeholder.jpg';">
-                    
-                    <!-- Второе фото (если есть) -->
-                    {% if second_photo and second_photo != '/static/shop/img/placeholder.jpg' %}
-                    <img src="{{ second_photo }}" alt="{{ product.name }} - вид 2" 
+                    <!-- Второе фото (если есть файл) -->
+                    <img src="/static/products/{{ product.slug }}-2.jpg" alt="{{ product.name }} - вид 2" 
                          class="gallery-slide" data-index="1"
                          onerror="this.style.display='none';">
-                    {% endif %}
                     
-                    <!-- Кнопки навигации, если больше 1 фото -->
-                    {% if second_photo and second_photo != '/static/shop/img/placeholder.jpg' %}
+                    <!-- Кнопки навигации, если есть второе фото -->
                     <button class="gallery-arrow gallery-prev" onclick="changeSlide(-1)">❮</button>
                     <button class="gallery-arrow gallery-next" onclick="changeSlide(1)">❯</button>
                     <div class="gallery-counter">
                         <span id="currentSlide">1</span> / <span id="totalSlides">2</span>
                     </div>
-                    {% endif %}
-                    
-                    {% endwith %}
                 </div>
                 
-                <!-- Миниатюры (если есть второе фото) -->
-                {% with second_photo=product.get_image_2_url %}
-                {% if second_photo and second_photo != '/static/shop/img/placeholder.jpg' %}
+                <!-- Миниатюры -->
                 <div class="gallery-thumbnails">
-                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" 
+                    <img src="/static/products/{{ product.slug }}.jpg" alt="{{ product.name }}" 
                          class="gallery-thumb active" onclick="goToSlide(0)"
-                         onerror="this.src='/static/shop/img/placeholder.jpg';">
-                    <img src="{{ second_photo }}" alt="{{ product.name }} - вид 2" 
+                         onerror="this.src='/static/img/placeholder.jpg';">
+                    <img src="/static/products/{{ product.slug }}-2.jpg" alt="{{ product.name }} - вид 2" 
                          class="gallery-thumb" onclick="goToSlide(1)"
                          onerror="this.style.display='none';">
                 </div>
-                {% endif %}
-                {% endwith %}
             </div>
         </div>
         
@@ -213,9 +200,9 @@
             {% for related_product in related_products %}
             <div class="col-6 col-md-3 mb-4">
                 <div class="product-card card h-100 border-0 shadow-sm">
-                    <img src="{{ related_product.get_image_url }}" class="card-img-top" alt="{{ related_product.name }}"
+                    <img src="/static/products/{{ related_product.slug }}.jpg" class="card-img-top" alt="{{ related_product.name }}"
                          style="height: 200px; object-fit: cover;"
-                         onerror="this.onerror=null; this.src='/static/shop/img/placeholder.jpg';">
+                         onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
                     <div class="card-body">
                         <h6 class="card-title">{{ related_product.name }}</h6>
                         <p class="card-text fw-bold text-primary">{{ related_product.price }} ₽</p>
@@ -247,14 +234,21 @@ function decrementQuantity() {
 let currentSlideIndex = 0;
 const slides = document.querySelectorAll('.gallery-slide');
 const thumbs = document.querySelectorAll('.gallery-thumb');
-const totalSlides = slides.length;
+let totalSlides = slides.length;
 
-if (totalSlides > 0 && document.getElementById('totalSlides')) {
-    document.getElementById('totalSlides').textContent = totalSlides;
+// Скрываем второй слайд если его нет
+if (slides.length === 1) {
+    document.querySelector('.gallery-arrow')?.remove();
+    document.querySelector('.gallery-counter')?.remove();
+} else {
+    totalSlides = 2;
+    if (document.getElementById('totalSlides')) {
+        document.getElementById('totalSlides').textContent = totalSlides;
+    }
 }
 
 function changeSlide(direction) {
-    if (totalSlides === 0) return;
+    if (totalSlides <= 1) return;
     slides[currentSlideIndex].classList.remove('active');
     if (thumbs[currentSlideIndex]) thumbs[currentSlideIndex].classList.remove('active');
     currentSlideIndex += direction;
@@ -268,7 +262,7 @@ function changeSlide(direction) {
 }
 
 function goToSlide(index) {
-    if (totalSlides === 0) return;
+    if (totalSlides <= 1) return;
     slides[currentSlideIndex].classList.remove('active');
     if (thumbs[currentSlideIndex]) thumbs[currentSlideIndex].classList.remove('active');
     currentSlideIndex = index;
