@@ -160,38 +160,41 @@ class Product(models.Model):
             return int(((self.price - self.sale_price) / self.price) * 100)
         return 0
     
-    # ========== МЕТОДЫ ДЛЯ ПОЛУЧЕНИЯ ФОТО ==========
+    # ========== МЕТОДЫ ДЛЯ ФОТО (без ошибок) ==========
     
     def get_image_url(self):
-        """
-        Возвращает URL главного фото товара.
-        Приоритет: загруженное фото > внешняя ссылка > статический файл
-        """
-        # Приоритет 1: загруженное через админку фото
+        """Главное фото"""
         if self.image and self.image.name:
             return self.image.url
-        # Приоритет 2: ссылка из внешнего источника (ВК и т.д.)
         if self.image_url:
             return self.image_url
-        # Приоритет 3: статический файл по slug товара
+        # Пробуем найти файл по slug
         return f'/static/shop/products/{self.slug}.jpg'
     
     def get_image_2_url(self):
-        """Возвращает URL второго фото"""
+        """Второе фото - если есть"""
         if self.image_2 and self.image_2.name:
             return self.image_2.url
         if self.image_url_2:
             return self.image_url_2
-        return None
+        # Пробуем найти файл slug-2.jpg
+        return f'/static/shop/products/{self.slug}-2.jpg'
     
     def get_image_3_url(self):
-        """Возвращает URL третьего фото"""
+        """Третье фото - если есть"""
         if self.image_3 and self.image_3.name:
             return self.image_3.url
         if self.image_url_3:
             return self.image_url_3
-        return None
-
+        return None  # Третье фото не используем
+    
+    def has_second_image(self):
+        """Проверяет, есть ли второе фото"""
+        if self.image_2 and self.image_2.name:
+            return True
+        if self.image_url_2:
+            return True
+        return False
 
 class WishlistItem(models.Model):
     """Модель избранного"""

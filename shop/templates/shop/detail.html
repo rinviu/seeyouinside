@@ -24,30 +24,46 @@
         <div class="col-lg-6 mb-4">
             <div class="product-gallery-slider">
                 <div class="gallery-main">
-                    {% for img in images %}
-                    <img src="{{ img.url }}" alt="{{ img.alt }}" 
-                         class="gallery-slide {% if forloop.first %}active{% endif %}" 
-                         data-index="{{ forloop.counter0 }}">
-                    {% endfor %}
+                    <!-- СБОР ВСЕХ ФОТО ТОВАРА -->
+                    {% with main_photo=product.get_image_url second_photo=product.get_image_2_url %}
                     
-                    {% if images|length > 1 %}
+                    <!-- Главное фото всегда есть -->
+                    <img src="{{ main_photo }}" alt="{{ product.name }}" 
+                         class="gallery-slide active" data-index="0"
+                         onerror="this.onerror=null; this.src='/static/shop/img/placeholder.jpg';">
+                    
+                    <!-- Второе фото (если есть) -->
+                    {% if second_photo and second_photo != '/static/shop/img/placeholder.jpg' %}
+                    <img src="{{ second_photo }}" alt="{{ product.name }} - вид 2" 
+                         class="gallery-slide" data-index="1"
+                         onerror="this.style.display='none';">
+                    {% endif %}
+                    
+                    <!-- Кнопки навигации, если больше 1 фото -->
+                    {% if second_photo and second_photo != '/static/shop/img/placeholder.jpg' %}
                     <button class="gallery-arrow gallery-prev" onclick="changeSlide(-1)">❮</button>
                     <button class="gallery-arrow gallery-next" onclick="changeSlide(1)">❯</button>
                     <div class="gallery-counter">
-                        <span id="currentSlide">1</span> / <span id="totalSlides">{{ images|length }}</span>
+                        <span id="currentSlide">1</span> / <span id="totalSlides">2</span>
                     </div>
                     {% endif %}
+                    
+                    {% endwith %}
                 </div>
                 
-                {% if images|length > 1 %}
+                <!-- Миниатюры (если есть второе фото) -->
+                {% with second_photo=product.get_image_2_url %}
+                {% if second_photo and second_photo != '/static/shop/img/placeholder.jpg' %}
                 <div class="gallery-thumbnails">
-                    {% for img in images %}
-                    <img src="{{ img.url }}" alt="{{ img.alt }}" 
-                         class="gallery-thumb {% if forloop.first %}active{% endif %}" 
-                         onclick="goToSlide({{ forloop.counter0 }})">
-                    {% endfor %}
+                    <img src="{{ product.get_image_url }}" alt="{{ product.name }}" 
+                         class="gallery-thumb active" onclick="goToSlide(0)"
+                         onerror="this.src='/static/shop/img/placeholder.jpg';">
+                    <img src="{{ second_photo }}" alt="{{ product.name }} - вид 2" 
+                         class="gallery-thumb" onclick="goToSlide(1)"
+                         onerror="this.style.display='none';">
                 </div>
                 {% endif %}
+                {% endwith %}
             </div>
         </div>
         
@@ -79,30 +95,52 @@
             </div>
             
             <!-- Характеристики -->
-            {% if specifications %}
             <div class="mb-4">
                 <h5 class="fw-bold">Характеристики</h5>
                 <table class="table table-sm">
-                    {% for spec in specifications %}
+                    {% if product.size %}
                     <tr>
-                        <td class="text-muted" style="width: 40%;">{{ spec.name }}</td>
-                        <td>{{ spec.value }}</td>
+                        <td class="text-muted" style="width: 40%;">Размеры</td>
+                        <td>{{ product.size }}</td>
                     </tr>
-                    {% endfor %}
+                    {% endif %}
+                    {% if product.color %}
+                    <tr>
+                        <td class="text-muted">Цвет</td>
+                        <td>{{ product.color }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if product.material %}
+                    <tr>
+                        <td class="text-muted">Материал</td>
+                        <td>{{ product.material }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if product.collection %}
+                    <tr>
+                        <td class="text-muted">Коллекция</td>
+                        <td>{{ product.get_collection_display }}</td>
+                    </tr>
+                    {% endif %}
+                    {% if product.season %}
+                    <tr>
+                        <td class="text-muted">Сезон</td>
+                        <td>{{ product.get_season_display }}</td>
+                    </tr>
+                    {% endif %}
                 </table>
             </div>
-            {% endif %}
             
             <!-- ФОРМА ДОБАВЛЕНИЯ В КОРЗИНУ -->
             {% if product.available %}
             <form action="{% url 'shop:cart_add' product.id %}" method="post" class="add-to-cart-form mb-3">
                 {% csrf_token %}
                 
-                {% if sizes %}
+                {% if product.get_sizes_list %}
                 <div class="mb-3">
                     <label class="fw-bold mb-2">Выберите размер:</label>
                     <div class="size-selector">
-                        {% for size in sizes %}
+                        {% for size in product.get_sizes_list %}
                         <div class="size-option">
                             <input type="radio" name="size" value="{{ size }}" id="size_{{ size }}" 
                                    {% if forloop.first %}required{% endif %}>
@@ -132,7 +170,7 @@
                 </button>
             </form>
             
-            <!-- Кнопка избранного ОТДЕЛЬНО от формы корзины -->
+            <!-- Кнопка избранного -->
             <form action="{% url 'shop:wishlist_toggle' product.id %}" method="post">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline-danger btn-lg w-100">
@@ -172,17 +210,16 @@
     <section class="mt-5">
         <h3 class="fw-bold mb-4">Похожие товары</h3>
         <div class="row">
-            {% for product in related_products %}
+            {% for related_product in related_products %}
             <div class="col-6 col-md-3 mb-4">
                 <div class="product-card card h-100 border-0 shadow-sm">
-                    {% if product.image %}
-                    <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}"
-                         style="height: 200px; object-fit: cover;">
-                    {% endif %}
+                    <img src="{{ related_product.get_image_url }}" class="card-img-top" alt="{{ related_product.name }}"
+                         style="height: 200px; object-fit: cover;"
+                         onerror="this.onerror=null; this.src='/static/shop/img/placeholder.jpg';">
                     <div class="card-body">
-                        <h6 class="card-title">{{ product.name }}</h6>
-                        <p class="card-text fw-bold text-primary">{{ product.price }} ₽</p>
-                        <a href="{% url 'shop:product_detail' product.id product.slug %}" 
+                        <h6 class="card-title">{{ related_product.name }}</h6>
+                        <p class="card-text fw-bold text-primary">{{ related_product.price }} ₽</p>
+                        <a href="{% url 'shop:product_detail' related_product.id related_product.slug %}" 
                            class="btn btn-outline-primary btn-sm w-100">Подробнее</a>
                     </div>
                 </div>

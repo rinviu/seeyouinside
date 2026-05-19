@@ -147,17 +147,10 @@
                 <div class="col-6 col-md-4 mb-4">
                     <div class="product-card card h-100 border-0 shadow-sm">
                         <div class="position-relative">
-                            <!-- ОБНОВЛЕННЫЙ БЛОК С ИЗОБРАЖЕНИЕМ -->
-                            {% if product.get_image_url %}
+                            <!-- ФОТО ТОВАРА С ЗАЩИТОЙ ОТ ОШИБОК -->
                             <img src="{{ product.get_image_url }}" class="card-img-top" alt="{{ product.name }}"
                                  style="height: 220px; object-fit: cover;"
                                  onerror="this.onerror=null; this.src='/static/shop/img/placeholder.jpg';">
-                            {% else %}
-                            <div class="bg-light d-flex align-items-center justify-content-center" 
-                                 style="height: 220px;">
-                                <i class="fas fa-image fa-3x text-muted"></i>
-                            </div>
-                            {% endif %}
                             
                             {% if product.is_new %}
                             <div class="product-badge"><span class="badge-new">NEW</span></div>
