@@ -62,7 +62,7 @@
                     <div class="header-right-section">
                         <a href="{% url 'shop:wishlist_detail' %}" class="header-icon" title="Избранное">
                             <i class="far fa-heart"></i>
-                            <span class="icon-badge wishlist-count" id="wishlist-count-badge">0</span>
+                            <span class="icon-badge wishlist-count" id="wishlist-count-badge">{{ wishlist_count|default:0 }}</span>
                         </a>
                         <a href="{% url 'shop:cart_detail' %}" class="header-icon cart-icon" title="Корзина">
                             <i class="fas fa-shopping-cart"></i>
@@ -381,18 +381,37 @@
                 sc.addEventListener('click', () => { si.value = ''; sc.style.display = 'none'; si.focus(); });
             }
             
-            // СЧЕТЧИКИ
-            fetch('/api/header-info/').then(r => r.json()).then(d => {
-                const cb = document.getElementById('cart-count-badge');
-                const wb = document.getElementById('wishlist-count-badge');
-                if (cb) cb.textContent = d.cart_count || 0;
-                if (wb) wb.textContent = d.wishlist_count || 0;
-            }).catch(() => {});
-        });
-    </script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
+            // ФУНКЦИЯ ОБНОВЛЕНИЯ СЧЁТЧИКОВ
+            function updateHeaderCounters() {
+                fetch('/api/header-info/')
+                    .then(response => response.json())
+                    .then(data => {
+                        const cartBadge = document.getElementById('cart-count-badge');
+                        const wishlistBadge = document.getElementById('wishlist-count-badge');
+                        if (cartBadge) cartBadge.textContent = data.cart_count || 0;
+                        if (wishlistBadge) wishlistBadge.textContent = data.wishlist_count || 0;
+                    })
+                    .catch(error => console.error('Ошибка обновления:', error));
+            }
+            
+            // Первоначальная загрузка счетчиков
+            updateHeaderCounters();
+            
+            // Перехватываем отправку формы добавления в корзину
+            document.querySelectorAll('.add-to-cart-form').forEach(form => {
+                form.addEventListener('submit', function() {
+                    setTimeout(updateHeaderCounters, 500);
+                });
+            });
+            
+            // Перехватываем добавление/удаление из избранного
+            document.querySelectorAll('form[action*="wishlist_toggle"]').forEach(form => {
+                form.addEventListener('submit', function() {
+                    setTimeout(updateHeaderCounters, 500);
+                });
+            });
+            
+            // СКРОЛЛ ШАПКИ
             const h = document.querySelector('.header-adeleide');
             const hm = document.querySelector('.header-main');
             const bl = document.querySelector('.brand-logo');
@@ -401,8 +420,8 @@
             
             window.addEventListener('scroll', function() {
                 const s = window.pageYOffset > 50;
-                h.classList.toggle('header-scrolled', s);
-                hm.classList.toggle('header-main-scrolled', s);
+                if (h) h.classList.toggle('header-scrolled', s);
+                if (hm) hm.classList.toggle('header-main-scrolled', s);
                 if (bl) bl.classList.toggle('brand-logo-scrolled', s);
                 if (cl) cl.classList.toggle('center-logo-scrolled', s);
                 nl.forEach(l => l.classList.toggle('nav-link-scrolled', s));
