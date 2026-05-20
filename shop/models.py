@@ -352,3 +352,18 @@ class OrderItem(models.Model):
     
     def total_price(self):
         return self.price * self.quantity
+    
+def get_subcategory_display(self):
+    """Возвращает читаемое название подкатегории"""
+    subcategories = dict(self.SUBCATEGORY_CHOICES)
+    return subcategories.get(self.subcategory, self.subcategory or '')
+
+def get_collection_display(self):
+    """Возвращает читаемое название коллекции"""
+    collections = dict(self.COLLECTION_CHOICES)
+    return collections.get(self.collection, self.collection or '')
+
+def get_season_display(self):
+    """Возвращает читаемое название сезона"""
+    seasons = dict(self.SEASON_CHOICES)
+    return seasons.get(self.season, self.season or '')

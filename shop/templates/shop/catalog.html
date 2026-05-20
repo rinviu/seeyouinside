@@ -95,6 +95,49 @@
                     </div>
                     {% endif %}
                     
+                    <!-- ============================================ -->
+                    <!-- КЛАССИФИКАЦИЯ: ПОДКАТЕГОРИЯ, КОЛЛЕКЦИЯ, СЕЗОН -->
+                    <!-- ============================================ -->
+                    
+                    <!-- Подкатегория -->
+                    {% if all_subcategories %}
+                    <div class="filter-group">
+                        <label class="filter-label fw-bold">Подкатегория</label>
+                        <select name="subcategory" class="form-select form-select-sm">
+                            <option value="">Все подкатегории</option>
+                            {% for subcat in all_subcategories %}
+                            <option value="{{ subcat }}" {% if request.GET.subcategory == subcat %}selected{% endif %}>{{ subcat }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Коллекция -->
+                    {% if all_collections %}
+                    <div class="filter-group">
+                        <label class="filter-label fw-bold">Коллекция</label>
+                        <select name="collection" class="form-select form-select-sm">
+                            <option value="">Все коллекции</option>
+                            {% for coll in all_collections %}
+                            <option value="{{ coll }}" {% if request.GET.collection == coll %}selected{% endif %}>{{ coll }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Сезон -->
+                    {% if all_seasons %}
+                    <div class="filter-group">
+                        <label class="filter-label fw-bold">Сезон</label>
+                        <select name="season" class="form-select form-select-sm">
+                            <option value="">Все сезоны</option>
+                            {% for season in all_seasons %}
+                            <option value="{{ season }}" {% if request.GET.season == season %}selected{% endif %}>{{ season }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    
                     <!-- Дополнительные фильтры -->
                     <div class="filter-group">
                         <div class="form-check mb-2">
@@ -177,7 +220,6 @@
                             </div>
                             {% endif %}
                             
-                            <!-- КНОПКА ПОДРОБНЕЕ ВНИЗУ КАРТОЧКИ -->
                             <div class="mt-auto">
                                 <a href="{% url 'shop:product_detail' product.id product.slug %}" 
                                    class="btn btn-primary btn-sm w-100">
@@ -196,7 +238,7 @@
                 <ul class="pagination justify-content-center">
                     {% if products.has_previous %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                        <a class="page-link" href="?page={{ products.previous_page_number }}{% if query %}&q={{ query }}{% if request.GET.subcategory %}&subcategory={{ request.GET.subcategory }}{% endif %}{% endif %}">
                             <i class="fas fa-chevron-left"></i>
                         </a>
                     </li>
@@ -207,14 +249,16 @@
                         <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                         {% elif num > products.number|add:'-3' and num < products.number|add:'3' %}
                         <li class="page-item">
-                            <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}">{{ num }}</a>
+                            <a class="page-link" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.subcategory %}&subcategory={{ request.GET.subcategory }}{% endif %}{% if request.GET.collection %}&collection={{ request.GET.collection }}{% endif %}{% if request.GET.season %}&season={{ request.GET.season }}{% endif %}">
+                                {{ num }}
+                            </a>
                         </li>
                         {% endif %}
                     {% endfor %}
                     
                     {% if products.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}">
+                        <a class="page-link" href="?page={{ products.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.subcategory %}&subcategory={{ request.GET.subcategory }}{% endif %}{% if request.GET.collection %}&collection={{ request.GET.collection }}{% endif %}{% if request.GET.season %}&season={{ request.GET.season }}{% endif %}">
                             <i class="fas fa-chevron-right"></i>
                         </a>
                     </li>
@@ -224,7 +268,6 @@
             {% endif %}
             
             {% else %}
-            <!-- Нет товаров -->
             <div class="text-center py-5">
                 <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
                 <h3>Товары не найдены</h3>

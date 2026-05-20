@@ -116,10 +116,12 @@ def catalog(request, category_slug=None):
         category = get_object_or_404(Category, slug=category_slug)
         products = products.filter(category=category)
     
+    # ПОИСК
     query = request.GET.get('q', '').strip()
     if query:
         products = products.filter(Q(name__icontains=query) | Q(description__icontains=query) | Q(color__icontains=query))
     
+    # ЦЕНА
     min_price = request.GET.get('min_price')
     max_price = request.GET.get('max_price')
     if min_price:
@@ -129,25 +131,34 @@ def catalog(request, category_slug=None):
         try: products = products.filter(price__lte=Decimal(max_price))
         except: pass
     
+    # РАЗМЕР И ЦВЕТ
     size_filter = request.GET.get('size')
     if size_filter: products = products.filter(size__icontains=size_filter)
     color_filter = request.GET.get('color')
     if color_filter: products = products.filter(color__icontains=color_filter)
     
+    # НОВИНКИ И РАСПРОДАЖА
     new_only = request.GET.get('new_only')
     if new_only: products = products.filter(is_new=True)
     sale_only = request.GET.get('sale_only')
     if sale_only: products = products.filter(is_sale=True)
     
+    # ============================================
+    # КЛАССИФИКАЦИЯ (ДОБАВЛЕНО)
+    # ============================================
     gender = request.GET.get('gender')
     if gender: products = products.filter(gender=gender)
+    
     subcategory = request.GET.get('subcategory')
     if subcategory: products = products.filter(subcategory=subcategory)
+    
     collection = request.GET.get('collection')
     if collection: products = products.filter(collection=collection)
+    
     season = request.GET.get('season')
     if season: products = products.filter(season=season)
     
+    # СОРТИРОВКА
     sort_by = request.GET.get('sort', '-created_at')
     sort_options = {
         '-created_at': 'Новинки', 'created_at': 'Сначала старые',
@@ -156,36 +167,72 @@ def catalog(request, category_slug=None):
     }
     products = products.order_by(sort_by) if sort_by in sort_options else products.order_by('-created_at')
     
+    # ПАГИНАЦИЯ
     paginator = Paginator(products, 12)
     page = request.GET.get('page', 1)
     try: products_page = paginator.page(page)
     except PageNotAnInteger: products_page = paginator.page(1)
     except EmptyPage: products_page = paginator.page(paginator.num_pages)
     
+    # ============================================
+    # СБОР ДАННЫХ ДЛЯ ФИЛЬТРОВ (ДОБАВЛЕНО)
+    # ============================================
     all_products_for_filters = Product.objects.filter(available=True)
-    if category: all_products_for_filters = all_products_for_filters.filter(category=category)
-    all_sizes = set(); all_colors = set()
+    if category:
+        all_products_for_filters = all_products_for_filters.filter(category=category)
+    
+    # Размеры и цвета
+    all_sizes = set()
+    all_colors = set()
     for p in all_products_for_filters:
-        if p.size: all_sizes.update([s.strip() for s in p.size.split(',') if s.strip()])
-        if p.color: all_colors.add(p.color.strip())
+        if p.size:
+            all_sizes.update([s.strip() for s in p.size.split(',') if s.strip()])
+        if p.color:
+            all_colors.add(p.color.strip())
+    
+    # Подкатегории, коллекции, сезоны (ДОБАВЛЕНО)
+    all_subcategories = set()
+    all_collections = set()
+    all_seasons = set()
+    
+    for p in all_products_for_filters:
+        if p.subcategory:
+            # Получаем читаемое название подкатегории
+            all_subcategories.add(p.get_subcategory_display() if hasattr(p, 'get_subcategory_display') else p.subcategory)
+        if p.collection:
+            all_collections.add(p.get_collection_display() if hasattr(p, 'get_collection_display') else p.collection)
+        if p.season:
+            all_seasons.add(p.get_season_display() if hasattr(p, 'get_season_display') else p.season)
     
     total_products = products.count()
     page_title = f'{category.name} | Каталог' if category else 'Каталог одежды | SeeYouInside'
     
     context = {
-        'category': category, 'categories': categories, 'products': products_page,
-        'total_products': total_products, 'query': query,
-        'min_price': min_price, 'max_price': max_price,
-        'size_filter': size_filter, 'color_filter': color_filter,
-        'new_only': new_only, 'sale_only': sale_only,
-        'gender': gender, 'subcategory': subcategory,
-        'collection': collection, 'season': season,
-        'all_sizes': sorted(all_sizes), 'all_colors': sorted(all_colors),
-        'sort_by': sort_by, 'sort_options': sort_options,
+        'category': category,
+        'categories': categories,
+        'products': products_page,
+        'total_products': total_products,
+        'query': query,
+        'min_price': min_price,
+        'max_price': max_price,
+        'size_filter': size_filter,
+        'color_filter': color_filter,
+        'new_only': new_only,
+        'sale_only': sale_only,
+        'gender': gender,
+        'subcategory': subcategory,
+        'collection': collection,
+        'season': season,
+        'all_sizes': sorted(all_sizes),
+        'all_colors': sorted(all_colors),
+        'all_subcategories': sorted(all_subcategories),  # ДОБАВЛЕНО
+        'all_collections': sorted(all_collections),      # ДОБАВЛЕНО
+        'all_seasons': sorted(all_seasons),              # ДОБАВЛЕНО
+        'sort_by': sort_by,
+        'sort_options': sort_options,
         'page_title': page_title,
     }
     return render(request, 'shop/catalog.html', context)
-
 
 def product_detail(request, id, slug):
     """Карточка товара"""
