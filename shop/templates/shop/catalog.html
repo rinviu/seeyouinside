@@ -183,12 +183,6 @@
                                    class="btn btn-outline-primary btn-sm flex-grow-1">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <form action="{% url 'shop:cart_add' product.id %}" method="post" 
-                                      class="add-to-cart-form flex-grow-1">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="quantity" value="1">
-                                    <button type="submit" class="btn btn-primary btn-sm w-100">
-                                        <i class="fas fa-cart-plus"></i>
                                     </button>
                                 </form>
                             </div>
