@@ -2527,3 +2527,60 @@ body {
         display: none !important;
     }
 }
+
+/* ============================================
+ * ВЫРАВНИВАНИЕ КАРТОЧЕК ТОВАРОВ
+ * ============================================ */
+
+/* Карточка товара - flex контейнер */
+.product-card {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Тело карточки - растягивается */
+.product-card .card-body {
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1 !important;
+}
+
+/* Заголовок с фиксированной минимальной высотой */
+.product-card .card-title {
+    min-height: 48px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    /* Добавлено стандартное свойство */
+    overflow: hidden;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+/* Кнопка прижимается к низу */
+.product-card .mt-auto {
+    margin-top: auto !important;
+}
+
+/* Цена с отступом перед кнопкой */
+.product-card .mb-3 {
+    margin-bottom: 16px !important;
+}
+
+/* Ховер эффект для картинки */
+.product-card .card-img-top {
+    transition: transform 0.4s ease;
+}
+
+.product-card:hover .card-img-top {
+    transform: scale(1.02);
+}

@@ -145,9 +145,8 @@
             <div class="row">
                 {% for product in products %}
                 <div class="col-6 col-md-4 mb-4">
-                    <div class="product-card card h-100 border-0 shadow-sm">
+                    <div class="product-card card h-100 border-0 shadow-sm d-flex flex-column">
                         <div class="position-relative">
-                            <!-- ФОТО ТОВАРА - ТОЛЬКО ИЗ STATIC -->
                             <img src="/static/products/{{ product.slug }}.jpg" class="card-img-top" alt="{{ product.name }}"
                                  style="height: 220px; object-fit: cover;"
                                  onerror="this.onerror=null; this.src='/static/img/placeholder.jpg';">
@@ -163,28 +162,27 @@
                             {% endif %}
                         </div>
                         
-                        <div class="card-body">
-                            <h6 class="card-title">{{ product.name }}</h6>
+                        <div class="card-body d-flex flex-column flex-grow-1">
+                            <h6 class="card-title" style="min-height: 48px;">{{ product.name|truncatechars:45 }}</h6>
                             <p class="card-text text-muted small mb-2">{{ product.category.name }}</p>
                             
                             {% if product.is_sale %}
-                            <div class="mb-2">
+                            <div class="mb-3">
                                 <span class="old-price small text-muted text-decoration-line-through">{{ product.price }} ₽</span>
                                 <span class="fw-bold text-danger ms-2">{{ product.sale_price }} ₽</span>
                             </div>
                             {% else %}
-                            <div class="mb-2">
+                            <div class="mb-3">
                                 <span class="fw-bold text-primary">{{ product.price }} ₽</span>
                             </div>
                             {% endif %}
                             
-                            <div class="d-flex gap-2">
+                            <!-- КНОПКА ПОДРОБНЕЕ ВНИЗУ КАРТОЧКИ -->
+                            <div class="mt-auto">
                                 <a href="{% url 'shop:product_detail' product.id product.slug %}" 
-                                   class="btn btn-outline-primary btn-sm flex-grow-1">
-                                    <i class="fas fa-eye"></i>
+                                   class="btn btn-primary btn-sm w-100">
+                                    <i class="fas fa-eye me-1"></i> Подробнее
                                 </a>
-                                    </button>
-                                </form>
                             </div>
                         </div>
                     </div>
