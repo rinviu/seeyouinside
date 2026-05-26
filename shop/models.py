@@ -162,31 +162,60 @@ class Product(models.Model):
     
     # ========== НОВЫЕ МЕТОДЫ - ИГНОРИРУЕМ MEDIA ==========
     
+    # В models.py, в классе Product, ЗАМЕНИТЕ все методы get_image_url на эти:
+
     def get_image_url(self):
         """
-        Главное фото - ТОЛЬКО из статики
-        Игнорируем image, image_2, image_3, image_url
+        Главное фото - приоритет:
+        1. Загруженное через админку изображение (image)
+        2. Внешняя ссылка (image_url)
+        3. Статический файл по slug
         """
+        # Приоритет 1: загруженное через админку фото
+        if self.image and self.image.name:
+            try:
+                return self.image.url
+            except:
+                pass
+        
+        # Приоритет 2: внешняя ссылка
+        if self.image_url:
+            return self.image_url
+        
+        # Приоритет 3: статический файл по slug
         return f'/static/products/{self.slug}.jpg'
     
     def get_image_2_url(self):
-        """
-        Второе фото - ТОЛЬКО из статики
-        """
+        """Второе фото"""
+        if self.image_2 and self.image_2.name:
+            try:
+                return self.image_2.url
+            except:
+                pass
+        if self.image_url_2:
+            return self.image_url_2
         return f'/static/products/{self.slug}-2.jpg'
     
     def get_image_3_url(self):
-        """
-        Третье фото - не используем
-        """
+        """Третье фото"""
+        if self.image_3 and self.image_3.name:
+            try:
+                return self.image_3.url
+            except:
+                pass
+        if self.image_url_3:
+            return self.image_url_3
         return None
     
     def has_second_image(self):
-        """Проверяет, есть ли второе фото (по факту существования файла)"""
-        # Просто возвращаем True, если нужно показывать второе фото
-        # HTML сам проверит через onerror
-        return True
+        """Проверяет наличие второго фото"""
+        if self.image_2 and self.image_2.name:
+            return True
+        if self.image_url_2:
+            return True
+        return False
     
+
     class Meta:
         verbose_name = "Товар"
         verbose_name_plural = "Товары"
